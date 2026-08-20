@@ -53,9 +53,9 @@ A professional portfolio case study exploring how AI can evolve from operational
 
 A conceptual multi-agent system that decomposes laundry-care decisions across classification, fabric, colour and stain specialists, with guardrails, sequential orchestration and final-response synthesis.
 
-### Peri&Positivas
+### [Peri&Positivas — AI-Enabled Digital Product](https://github.com/lisbetholiveira/peri-e-positivas-digital-product)
 
-A digital project focused on women 40+, transformation, wellbeing and career reinvention.
+A digital product and content ecosystem for women 40+, combining audience research, product discovery, content strategy and responsible AI.
 
 ### More coming soon
 
