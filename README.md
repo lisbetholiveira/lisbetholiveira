@@ -45,11 +45,9 @@ I am particularly interested in roles and projects where **business, people and 
 
 ## 🚀 Projects
 
-This portfolio is being built progressively. Projects will include:
+### [AI Strategy & Business Transformation — Decathlon Case Study](https://github.com/lisbetholiveira/ai-strategy-decathlon-case-study)
 
-### AI Strategy & Business Transformation
-
-Business cases exploring how organisations can apply AI in the short and long term.
+A professional portfolio case study exploring how AI can evolve from operational optimisation and personalisation toward digital coaching, wearable integration and phygital retail experiences.
 
 ### AI Agents & Automation
 
