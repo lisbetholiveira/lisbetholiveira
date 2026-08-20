@@ -49,9 +49,9 @@ I am particularly interested in roles and projects where **business, people and 
 
 A professional portfolio case study exploring how AI can evolve from operational optimisation and personalisation toward digital coaching, wearable integration and phygital retail experiences.
 
-### AI Agents & Automation
+### [Laundry Care Agent — Multi-Agent AI System](https://github.com/lisbetholiveira/ai-agent-laundry-care)
 
-Practical experiments with agents, workflows and intelligent automation.
+A conceptual multi-agent system that decomposes laundry-care decisions across classification, fabric, colour and stain specialists, with guardrails, sequential orchestration and final-response synthesis.
 
 ### Peri&Positivas
 
