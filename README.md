@@ -3,7 +3,7 @@
 
 ### AI & Business | Transformation | Customer Experience | Applied Innovation
 
-I'm a business leader transitioning into the intersection of **Artificial Intelligence, strategy and transformation**, with extensive experience in operations, customer experience, team leadership and performance management.
+I'm a business leader working at the intersection of **Artificial Intelligence, strategy and transformation**, with extensive experience in operations, customer experience, team leadership and performance management.
 
 My focus is not AI for the sake of technology. I'm interested in how AI can solve real business problems, improve decisions, automate work and create better customer and employee experiences.
 
