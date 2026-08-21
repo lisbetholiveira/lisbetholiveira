@@ -20,6 +20,8 @@ AI opportunity mapping for retail transformation, connecting operational optimis
 
 An academic multi-agent system originally designed with OpenAI tools and later extended into a functional Python and Streamlit prototype through AI-assisted development, preserving the original guardrails, routing and specialist-agent architecture.
 
+**Live demo:** [Try the Laundry Care Agent](https://ai-agent-laundry-care-ntwvxrdkvgq9ur2oqgybc7.streamlit.app)
+
 **Demonstrates:** AI-assisted Python prototyping · AI agents · workflow orchestration · guardrails · task routing · structured outputs · testing · implementation literacy
 
 ### [Peri&Positivas — AI-Enabled Digital Product](https://github.com/lisbetholiveira/peri-e-positivas-digital-product)
