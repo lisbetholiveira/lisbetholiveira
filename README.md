@@ -18,9 +18,9 @@ AI opportunity mapping for retail transformation, connecting operational optimis
 
 ### [Laundry Care Agent — Multi-Agent AI System](https://github.com/lisbetholiveira/ai-agent-laundry-care)
 
-A conceptual multi-agent architecture that decomposes laundry-care decisions across classification, fabric, colour and stain specialists, with guardrails, sequential orchestration and final-response synthesis.
+A functional Python prototype implementing a multi-agent workflow across guardrails, request classification, fabric, colour and stain specialists, with structured outputs, sequential orchestration, execution tracing and unit tests.
 
-**Demonstrates:** AI agents · workflow orchestration · guardrails · task routing · prompt design · structured outputs
+**Demonstrates:** Python · AI agents · workflow orchestration · guardrails · task routing · structured outputs · testing
 
 ### [Peri&Positivas — AI-Enabled Digital Product](https://github.com/lisbetholiveira/peri-e-positivas-digital-product)
 
@@ -32,7 +32,7 @@ A digital product and content ecosystem for women 40+, combining audience resear
 
 - Building practical **AI-powered solutions and automations**
 - Exploring **agentic AI and multi-step business workflows**
-- Developing **Python-based AI prototypes**
+- Building and testing **Python-based AI prototypes**
 - Applying AI to **customer experience, operations and digital products**
 - Strengthening my work in **AI strategy, implementation and responsible AI**
 
