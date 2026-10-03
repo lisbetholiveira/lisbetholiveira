@@ -26,9 +26,9 @@ An academic multi-agent system originally designed with OpenAI tools and later e
 
 ### [Peri&Positivas — AI-Enabled Digital Product](https://github.com/lisbetholiveira/peri-e-positivas-digital-product)
 
-A digital product and content ecosystem for women 40+, combining audience research, product discovery, SEO/AEO/GEO content strategy and responsible AI.
+A digital product and commerce ecosystem for women 40+, combining audience research, product discovery, SEO/AEO/GEO content strategy, funnel design, owned-audience growth and responsible AI. The current delivery stack connects WordPress, Beehiiv, Systeme.io and Lovable across discovery, lead capture, structured learning, email progression and interactive product experiences.
 
-**Demonstrates:** digital product strategy · Voice of Customer · product discovery · responsible AI · content systems
+**Demonstrates:** digital product strategy · funnel architecture · customer journey · owned audience · Systeme.io · Voice of Customer · product discovery · responsible AI · content systems
 
 ## 🔭 What I'm currently working on
 
@@ -36,6 +36,7 @@ A digital product and content ecosystem for women 40+, combining audience resear
 - Exploring **agentic AI and multi-step business workflows**
 - Using **AI-assisted development** to prototype and test Python-based workflows
 - Applying AI to **customer experience, operations and digital products**
+- Building hands-on experience in **digital commerce, funnel architecture and customer journeys**, including Systeme.io-based landing pages, lead capture, email progression and course/product delivery
 - Strengthening my work in **AI strategy, implementation and responsible AI**
 
 ## 🎓 Learning
@@ -50,6 +51,8 @@ Current areas of development include:
 - Automation
 - Python
 - Data and business intelligence
+- Digital commerce & funnel fundamentals
+- Customer journey and conversion logic
 - AI strategy and implementation
 
 ## 💼 Business background
