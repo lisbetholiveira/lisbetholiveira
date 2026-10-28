@@ -30,6 +30,17 @@ A digital product and commerce ecosystem for women 40+, combining audience resea
 
 **Demonstrates:** digital product strategy · funnel architecture · customer journey · owned audience · Systeme.io · Voice of Customer · product discovery · responsible AI · content systems
 
+### [Make — AI Workflow Automation Projects](https://www.make.com/)
+
+Designed and configured hands-on no-code automation scenarios in October 2026, combining AI services with operational workflows:
+
+- **23 October postgraduate exercise:** a five-module Make scenario connecting Google Forms, Perplexity, OpenAI (text and image generation) and Gmail, from form intake to email output. The scenario is currently inactive.
+- **Peri&Positivas editorial workflow:** an active eleven-module Make scenario connecting Perplexity, OpenAI, data stores and WordPress, with duplicate checks, filters, aggregation, source-checking steps and draft creation.
+
+**Demonstrates:** Make · no-code workflow design · AI service integration · conditional logic · data aggregation · content operations · process improvement
+
+*These are academic and independent digital-project implementations, not production payroll automations. Configurations and scenario status were reviewed in Make; full end-to-end output validation is not claimed.*
+
 ## 🔭 What I'm currently working on
 
 - Building practical **AI-powered solutions and automations**
