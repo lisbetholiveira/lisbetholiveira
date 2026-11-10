@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
 <style>
-/* Layout: one column, one task per screen, very large type and buttons for an older user on an Android phone */
+/* Layout: una columna, una tarea por pantalla, letra y botones muy grandes para un adulto mayor con Android */
 :root {
   --bg: #eef3f6;
   --surface: #ffffff;
@@ -17,6 +17,8 @@
   --warn: #a8431b;
   --figure: #102029;
   --figure-far: #8fa3ae;
+  --move: #1c56c4;
+  --ghost: rgba(28, 86, 196, 0.22);
   --floor: #b9c8d1;
   --font: "Atkinson Hyperlegible", "Segoe UI", Roboto, Arial, sans-serif;
 }
@@ -24,13 +26,15 @@
   :root:not([data-theme="light"]) {
     --bg: #0e1519; --surface: #172229; --ink: #eef4f7; --muted: #a9bcc6; --line: #2c3d47;
     --accent: #6fa1ff; --accent-ink: #0b1420; --good: #5fcf8d; --warn: #ff9a6b;
-    --figure: #eef4f7; --figure-far: #5d7380; --floor: #3a4d58; color-scheme: dark;
+    --figure: #eef4f7; --figure-far: #5d7380; --move: #7fb0ff; --ghost: rgba(127, 176, 255, 0.25);
+    --floor: #3a4d58; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0e1519; --surface: #172229; --ink: #eef4f7; --muted: #a9bcc6; --line: #2c3d47;
   --accent: #6fa1ff; --accent-ink: #0b1420; --good: #5fcf8d; --warn: #ff9a6b;
-  --figure: #eef4f7; --figure-far: #5d7380; --floor: #3a4d58; color-scheme: dark;
+  --figure: #eef4f7; --figure-far: #5d7380; --move: #7fb0ff; --ghost: rgba(127, 176, 255, 0.25);
+  --floor: #3a4d58; color-scheme: dark;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -68,9 +72,13 @@ p { margin: 0; }
 .bar { flex: 1; height: 12px; border-radius: 6px; background: var(--line); overflow: hidden; }
 .bar > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .3s; }
 .x { font: inherit; font-size: 18px; font-weight: 700; background: none; border: 2px solid var(--line); color: var(--ink); border-radius: 12px; padding: 8px 12px; cursor: pointer; }
-canvas { width: 100%; max-width: 100%; aspect-ratio: 400 / 240; display: block; border-radius: 14px; background: var(--bg); }
+.stage { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+canvas { width: 100%; max-width: 100%; aspect-ratio: 4 / 3; display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 16px; color: var(--muted); padding: 0 8px 4px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 22px; height: 8px; border-radius: 4px; display: inline-block; }
 ol.how { margin: 0; padding-left: 26px; display: flex; flex-direction: column; gap: 8px; }
-.tip { border-left: 6px solid var(--warn); padding: 6px 0 6px 12px; font-size: 18px; }
+.tip { border-left: 6px solid var(--accent); padding: 6px 0 6px 12px; font-size: 18px; }
 .run { text-align: center; display: flex; flex-direction: column; gap: 4px; align-items: center; }
 .run .say { font-size: 34px; font-weight: 700; }
 .run .num { font-size: 96px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -84,7 +92,8 @@ ol.how { margin: 0; padding-left: 26px; display: flex; flex-direction: column; g
 .days .today { border-color: var(--accent); }
 .list { margin: 0; padding-left: 26px; display: flex; flex-direction: column; gap: 4px; }
 .notice { background: var(--surface); border: 3px solid var(--accent); border-radius: 18px; padding: 14px 16px; font-weight: 700; }
-ul.flags { margin: 0; padding-left: 24px; display: flex; flex-direction: column; gap: 6px; }
+.notice.soft { border-color: var(--warn); font-weight: 400; font-size: 18px; }
+ul.flags { margin: 0; padding-left: 24px; display: flex; flex-direction: column; gap: 8px; }
 .toggle { display: flex; align-items: center; gap: 12px; font-size: 20px; }
 .toggle input { width: 30px; height: 30px; }
 details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
@@ -95,11 +104,12 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
 <!-- INICIO -->
 <section id="home" class="wrap">
   <div>
-    <p class="muted" id="hello">¡Hola!</p>
+    <p class="muted">¡Hola!</p>
     <h1>Ejercicios para la ciática</h1>
   </div>
-  <p>Unos <b>20 minutos</b>, un ejercicio a la vez. La app te habla y cuenta el tiempo.</p>
-  <button class="btn primary" id="startBtn">Empezar los ejercicios</button>
+  <p>Unos <b>20 minutos</b>. Un ejercicio a la vez: la app te explica cada uno en voz alta y te lleva el tiempo.</p>
+  <p class="notice soft" id="noVoice" hidden>Este teléfono no tiene voz en español. Para activarla: Ajustes › Sistema › Idioma › Texto a voz › Motor de Google › Instalar datos de voz › Español.</p>
+  <button class="btn primary" id="startBtn">Empezar</button>
   <div class="card">
     <h2>Últimos 14 días</h2>
     <div class="days" id="days"></div>
@@ -109,30 +119,21 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
     <summary>Ver la lista de ejercicios</summary>
     <ol class="list" id="exList"></ol>
   </details>
-  <button class="btn small" id="safetyBtn">Reglas de seguridad</button>
+  <button class="btn small" id="safetyBtn">Consejos antes de empezar</button>
   <label class="toggle"><input type="checkbox" id="voiceOn" checked> Voz activada</label>
-  <p class="small-print">Basado en las recomendaciones actuales para el dolor ciático: ejercicio regular, movilización suave del nervio y mantenerse activo (guía NICE NG59; revisiones sistemáticas 2024–2025). No sustituye al médico ni al fisioterapeuta.</p>
+  <button class="btn small" id="testVoice">Probar la voz</button>
+  <p class="small-print">Rutina basada en las recomendaciones actuales para la ciática: ejercicio regular, movilización suave del nervio y mantenerse activo (guía NICE NG59 y revisiones científicas de 2024 y 2025). No reemplaza la consulta con el médico o el fisioterapeuta.</p>
 </section>
 
-<!-- SEGURIDAD -->
+<!-- CONSEJOS -->
 <section id="safety" class="wrap" hidden>
   <h1>Antes de empezar</h1>
   <div class="card">
-    <h2>Reglas sencillas</h2>
     <ul class="flags">
-      <li>Hazlo todo despacio y sin forzar.</li>
-      <li>Sentir un estiramiento suave en la espalda o en el glúteo es normal.</li>
-      <li>Si el dolor o el hormigueo <b>baja más por la pierna</b>, para ese ejercicio y pulsa <b>"Duele, saltar"</b>.</li>
-      <li>Usa una cama firme o una colchoneta, y una silla firme apoyada contra la pared.</li>
-    </ul>
-  </div>
-  <div class="card" style="border-color: var(--warn); border-width: 3px;">
-    <h2 style="color: var(--warn)">Llama enseguida al médico o a emergencias si tienes:</h2>
-    <ul class="flags">
-      <li>Dificultad para orinar, o pérdida de control de la orina o del intestino.</li>
-      <li>Adormecimiento entre las piernas, en los glúteos o en los genitales.</li>
-      <li>Debilidad en la pierna que va empeorando (el pie "se cae" o la pierna falla).</li>
-      <li>Dolor de espalda después de una caída, o con fiebre.</li>
+      <li>Haz todos los movimientos despacio y sin forzar.</li>
+      <li>Es normal sentir un estiramiento suave en la espalda o en el glúteo.</li>
+      <li>Si el dolor o el hormigueo se extiende más abajo por la pierna, deja ese ejercicio y toca <b>«Me duele»</b>.</li>
+      <li>Usa una cama firme o una colchoneta, y una silla firme pegada a la pared.</li>
     </ul>
   </div>
   <button class="btn primary" id="ackBtn">Entendido</button>
@@ -140,10 +141,10 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
 
 <!-- DOLOR -->
 <section id="pain" class="wrap" hidden>
-  <h1 id="painTitle">¿Cómo está el dolor ahora?</h1>
+  <h1 id="painTitle">¿Cuánto te duele ahora?</h1>
   <div class="pain" id="painBtns"></div>
   <p class="notice" id="painNote" hidden></p>
-  <button class="btn primary" id="painGo" hidden>Continuar</button>
+  <button class="btn primary" id="painGo" hidden>Seguir</button>
 </section>
 
 <!-- EJERCICIO -->
@@ -154,11 +155,15 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
     <button class="x" id="quitBtn">Salir</button>
   </div>
   <p class="notice" id="moveNote" hidden></p>
-  <div>
-    <h1 id="exName"></h1>
-  </div>
+  <h1 id="exName"></h1>
   <span class="chip" id="exPos"></span>
-  <canvas id="fig" width="800" height="480" aria-label="Animación del ejercicio"></canvas>
+  <div class="stage">
+    <canvas id="fig" width="800" height="600" aria-label="Animación del ejercicio"></canvas>
+    <div class="legend">
+      <span><i style="background: var(--move)"></i>Lo que se mueve</span>
+      <span><i style="background: var(--ghost)"></i>Adónde llegar</span>
+    </div>
+  </div>
 
   <div id="idle" class="card">
     <p class="muted" id="exDose"></p>
@@ -180,18 +185,18 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
   </div>
   <div id="runBtns" class="row" hidden>
     <button class="btn" id="pauseBtn">Pausa</button>
-    <button class="btn warn" id="hurtBtn">Duele, saltar</button>
+    <button class="btn warn" id="hurtBtn">Me duele</button>
   </div>
 </section>
 
 <!-- FIN -->
 <section id="done" class="wrap" hidden>
   <h1>¡Muy bien!</h1>
-  <p>Los ejercicios de hoy están hechos. Mañana, más.</p>
+  <p>Terminaste los ejercicios de hoy. Mañana seguimos.</p>
   <div class="card" id="hurtCard" hidden>
-    <h2>Ejercicios que dolieron hoy</h2>
+    <h2>Ejercicios que te dolieron hoy</h2>
     <ul class="flags" id="hurtList"></ul>
-    <p class="muted">Si duelen siempre, muestra esta lista al médico o al fisioterapeuta.</p>
+    <p class="muted">Si te duelen siempre, enséñale esta lista al médico o al fisioterapeuta.</p>
   </div>
   <div class="card">
     <h2>Dolor antes y después</h2>
@@ -202,71 +207,71 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
 
 <script>
 (() => {
-// ---------- Figuras: pontos do corpo (vista de lado), chão em y=205 ----------
+// ---------- Figuras: puntos del cuerpo vistos de lado; el suelo está en y=208 ----------
 const mk = (base, o) => Object.assign({}, base, o);
 const S = { head:[70,190], sh:[100,193], mid:[150,195], hip:[200,194], kN:[250,145], fN:[292,198], kF:[246,148], fF:[286,198], el:[140,200], ha:[180,200] };
 const C = { head:[170,48], sh:[172,75], mid:[170,105], hip:[172,138], kN:[240,138], fN:[245,203], kF:[236,140], fF:[240,203], el:[178,110], ha:[205,130] };
 const T = { head:[200,-14], sh:[200,12], mid:[202,45], hip:[203,75], kN:[205,140], fN:[205,205], kF:[198,140], fF:[198,205], el:[205,45], ha:[208,78] };
 
 const EX = [
-  { id:'resp', name:'Respiración tranquila', pos:'Acostado boca arriba', dose:'6 respiraciones lentas',
-    how:['Acuéstate boca arriba en una cama firme o una colchoneta, con las rodillas dobladas y los pies apoyados.','Pon las manos sobre la barriga.','Inhala por la nariz y deja que la barriga suba. Exhala despacio por la boca.'],
+  { id:'resp', name:'Respiración profunda', pos:'Acostado boca arriba', dose:'6 respiraciones lentas',
+    how:['Acuéstate boca arriba con las rodillas dobladas y los pies apoyados.','Pon las manos sobre la barriga.','Toma aire por la nariz inflando la barriga, y suéltalo despacio por la boca.'],
     tip:'Sirve para relajar los músculos antes de empezar.',
-    sets:1, reps:6, phases:[['Inhala',4,'b'],['Exhala',5,'a']],
-    poses:{ a:mk(S,{el:[132,186],ha:[165,180]}), b:mk(S,{mid:[150,190],el:[132,182],ha:[165,172]}) } },
-  { id:'bascula', name:'Báscula de pelvis', pos:'Acostado boca arriba', dose:'2 series de 8',
-    how:['Mantén las rodillas dobladas y los pies en el suelo.','Pega la parte baja de la espalda al suelo, metiendo el ombligo hacia dentro.','Aguanta un poco y relaja. El movimiento es pequeño.'],
-    tip:'No aguantes la respiración.',
-    sets:2, reps:8, rest:15, phases:[['Pega la espalda',2,'b'],['Aguanta',3,'b'],['Relaja',3,'a']],
-    poses:{ a:S, b:mk(S,{hip:[200,198],mid:[150,198],kN:[247,147],kF:[243,150]}) } },
-  { id:'rodilla', name:'Rodilla al pecho', pos:'Acostado boca arriba', dose:'3 veces 20 segundos, cada pierna',
-    how:['Agarra una rodilla con las dos manos.','Llévala despacio hacia el pecho. La otra pierna queda doblada.','Sientes un estiramiento suave en la espalda y en el glúteo.'],
-    tip:'Tira solo hasta donde sea cómodo.',
-    sides:true, sets:1, reps:3, rest:10, phases:[['Lleva la rodilla',3,'b'],['Aguanta',20,'b'],['Suelta',4,'a']],
-    poses:{ a:S, b:mk(S,{kN:[185,125],fN:[240,148],el:[135,170],ha:[172,138]}) } },
-  { id:'rotacion', name:'Rotación de rodillas', pos:'Acostado boca arriba', dose:'6 veces a cada lado',
-    how:['Junta las rodillas.','Déjalas caer despacio hacia un lado, solo hasta donde sea cómodo. Los hombros se quedan en el suelo.','Vuelve al centro y repite hacia el otro lado.'],
-    tip:'Movimiento lento, sin balanceo.',
-    sets:1, reps:6, phases:[['A la derecha',3,'b'],['Al centro',2,'a'],['A la izquierda',3,'b'],['Al centro',2,'a']],
-    poses:{ a:S, b:mk(S,{kN:[258,180],kF:[254,172],fN:[294,201],fF:[288,200]}) } },
+    sets:1, reps:6, phases:[['Toma aire',4,'b'],['Suelta el aire',5,'a']],
+    poses:{ a:mk(S,{el:[132,186],ha:[165,182]}), b:mk(S,{mid:[150,180],el:[132,174],ha:[165,164]}) } },
+  { id:'pelvis', name:'Basculación de la pelvis', pos:'Acostado boca arriba', dose:'2 series de 8',
+    how:['Rodillas dobladas y pies apoyados en el suelo.','Aplana la parte baja de la espalda contra el suelo, metiendo la barriga.','Aguanta un momento y relaja. Es un movimiento pequeño.'],
+    tip:'Respira con normalidad. No aguantes el aire.',
+    sets:2, reps:8, rest:15, phases:[['Aplana la espalda',2,'b'],['Aguanta',3,'b'],['Relaja',3,'a']],
+    poses:{ a:mk(S,{mid:[150,186]}), b:mk(S,{mid:[150,201],hip:[204,190],kN:[244,136],kF:[240,139]}) } },
+  { id:'rodilla', name:'Rodilla al pecho', pos:'Acostado boca arriba', dose:'3 veces 20 segundos, con cada pierna',
+    how:['Abraza una rodilla con las dos manos.','Llévala despacio hacia el pecho. La otra pierna sigue doblada.','Notarás un estiramiento suave en la espalda y en el glúteo.'],
+    tip:'Lleva la rodilla solo hasta donde te resulte cómodo.',
+    sides:true, sets:1, reps:3, rest:10, phases:[['Rodilla al pecho',3,'b'],['Aguanta',20,'b'],['Suelta',4,'a']],
+    poses:{ a:S, b:mk(S,{kN:[178,124],fN:[234,144],el:[135,168],ha:[170,134]}) } },
+  { id:'giro', name:'Giro de rodillas', pos:'Acostado boca arriba', dose:'6 veces hacia cada lado',
+    how:['Junta las rodillas.','Déjalas caer despacio hacia un lado, solo hasta donde te resulte cómodo. Los hombros no se despegan del suelo.','Vuelve al centro y repite hacia el otro lado.'],
+    tip:'Hazlo lento, sin impulso.',
+    sets:1, reps:6, phases:[['Hacia la derecha',3,'b'],['Al centro',2,'a'],['Hacia la izquierda',3,'b'],['Al centro',2,'a']],
+    poses:{ a:S, b:mk(S,{kN:[256,174],kF:[252,166],fN:[296,203],fF:[290,202]}) } },
   { id:'puente', name:'Puente', pos:'Acostado boca arriba', dose:'2 series de 8',
-    how:['Pies apoyados al ancho de las caderas, brazos al lado del cuerpo.','Aprieta los glúteos y levanta la pelvis hasta quedar en línea de los hombros a las rodillas.','Baja despacio.'],
-    tip:'Fortalece los glúteos y protege la espalda. No subas demasiado.',
+    how:['Pies apoyados a la anchura de las caderas y brazos a los lados.','Aprieta los glúteos y levanta la cadera hasta que hombros, cadera y rodillas queden en línea.','Baja despacio.'],
+    tip:'Fortalece los glúteos y protege la espalda. No hace falta subir mucho.',
     sets:2, reps:8, rest:15, phases:[['Sube',2,'b'],['Aguanta',3,'b'],['Baja',3,'a']],
-    poses:{ a:S, b:mk(S,{hip:[205,160],mid:[150,182],kN:[262,140],kF:[258,143]}) } },
-  { id:'nervio1', name:'Deslizar el nervio (acostado)', pos:'Acostado boca arriba', dose:'10 veces cada pierna',
-    how:['Sujeta la pierna por detrás del muslo, con la rodilla doblada y el muslo vertical.','Estira la rodilla despacio hasta sentir una ligera tensión.','Vuelve a doblarla. Es un vaivén suave: no te quedes quieto con la pierna estirada.'],
-    tip:'Un hormigueo leve que se pasa enseguida es normal. Si se hace más fuerte, para.',
+    poses:{ a:S, b:mk(S,{hip:[208,148],mid:[152,172],kN:[264,136],kF:[260,139]}) } },
+  { id:'nervio1', name:'Deslizamiento del nervio (acostado)', pos:'Acostado boca arriba', dose:'10 veces con cada pierna',
+    how:['Sujeta la pierna por detrás del muslo, con la rodilla doblada y el muslo vertical.','Estira la rodilla despacio hasta notar una ligera tensión.','Vuelve a doblarla. Es un vaivén suave: no te quedes con la pierna estirada.'],
+    tip:'Es normal un hormigueo leve que se pasa enseguida. Si va a más, para.',
     sides:true, sets:1, reps:10, rest:10, phases:[['Estira',2,'b'],['Dobla',2,'a']],
-    poses:{ a:mk(S,{kN:[205,124],fN:[258,150],el:[150,172],ha:[200,150]}), b:mk(S,{kN:[205,124],fN:[212,58],el:[150,172],ha:[200,150]}) } },
-  { id:'piriforme', name:'Estiramiento del glúteo', pos:'Acostado boca arriba', dose:'2 veces 20 segundos, cada pierna',
-    how:['Cruza el tobillo sobre la rodilla de la otra pierna, como un "4".','Agarra el muslo de la pierna de abajo y lleva las dos piernas hacia el pecho.','Sientes el estiramiento en el glúteo. Respira con calma.'],
-    tip:'Si no llegas al muslo, usa una toalla por detrás de la pierna.',
-    sides:true, sets:1, reps:2, rest:10, phases:[['Lleva hacia el pecho',3,'b'],['Aguanta',20,'b'],['Suelta',5,'a']],
-    poses:{ a:mk(S,{kN:[235,135],fN:[248,142]}), b:mk(S,{kF:[215,135],fF:[262,165],kN:[205,120],fN:[224,132],el:[160,165],ha:[212,140]}) } },
-  { id:'nervio2', name:'Deslizar el nervio (sentado)', pos:'Sentado en una silla', chair:true, dose:'10 veces cada pierna',
-    how:['Siéntate en el borde de una silla firme, con la espalda recta.','Estira una rodilla y, al mismo tiempo, mira hacia arriba.','Luego dobla la rodilla y mira hacia abajo. Suave, sin aguantar.'],
-    tip:'Usa una silla sin ruedas, apoyada contra la pared.',
-    sides:true, sets:1, reps:10, rest:10, phases:[['Estira',2,'b'],['Dobla',2,'a']],
-    poses:{ a:mk(C,{head:[182,54]}), b:mk(C,{head:[164,44],fN:[305,128]}) } },
-  { id:'levantarse', name:'Levantarse y sentarse', pos:'Sentado en una silla', chair:true, scale:0.8, dose:'2 series de 6',
-    how:['Brazos cruzados sobre el pecho, pies bien apoyados en el suelo.','Inclínate un poco hacia delante y levántate con la fuerza de las piernas.','Siéntate despacio, con control. Si lo necesitas, usa las manos.'],
-    tip:'Fortalece las piernas y ayuda en el día a día.',
-    sets:2, reps:6, rest:15, phases:[['Levántate',3,'b'],['Siéntate despacio',3,'a']],
+    poses:{ a:mk(S,{kN:[205,124],fN:[262,156],el:[150,172],ha:[200,150]}), b:mk(S,{kN:[205,124],fN:[214,56],el:[150,172],ha:[200,150]}) } },
+  { id:'gluteo', name:'Estiramiento del glúteo', pos:'Acostado boca arriba', dose:'2 veces 20 segundos, con cada pierna',
+    how:['Cruza un tobillo sobre la rodilla contraria, formando un 4.','Agarra el muslo de la pierna de abajo y acerca las dos piernas al pecho.','Notarás el estiramiento en el glúteo. Respira tranquilo.'],
+    tip:'Si no llegas al muslo, ayúdate con una toalla.',
+    sides:true, sets:1, reps:2, rest:10, phases:[['Acerca las piernas',3,'b'],['Aguanta',20,'b'],['Suelta',5,'a']],
+    poses:{ a:mk(S,{kN:[235,135],fN:[248,142]}), b:mk(S,{kF:[205,125],fF:[258,150],kN:[192,112],fN:[212,124],el:[155,160],ha:[205,132]}) } },
+  { id:'nervio2', name:'Deslizamiento del nervio (sentado)', pos:'Sentado en una silla', chair:true, dose:'10 veces con cada pierna',
+    how:['Siéntate en el borde de una silla firme, con la espalda recta.','Estira una rodilla y, a la vez, mira hacia arriba.','Después dobla la rodilla y mira hacia abajo. Suave, sin aguantar.'],
+    tip:'Usa una silla sin ruedas, pegada a la pared.',
+    sides:true, sets:1, reps:10, rest:10, phases:[['Estira y mira arriba',2,'b'],['Dobla y mira abajo',2,'a']],
+    poses:{ a:mk(C,{head:[188,58]}), b:mk(C,{head:[160,42],fN:[306,126]}) } },
+  { id:'silla', name:'Levantarse de la silla', pos:'Sentado en una silla', chair:true, dose:'2 series de 6',
+    how:['Cruza los brazos sobre el pecho y apoya bien los pies en el suelo.','Échate un poco hacia delante y ponte de pie con la fuerza de las piernas.','Siéntate despacio, controlando la bajada. Si lo necesitas, apóyate con las manos.'],
+    tip:'Fortalece las piernas y te ayuda en el día a día.',
+    sets:2, reps:6, rest:15, phases:[['Arriba',3,'b'],['Siéntate despacio',3,'a']],
     poses:{ a:mk(C,{el:[190,95],ha:[176,88]}), b:{head:[234,-14],sh:[234,12],mid:[236,45],hip:[238,75],kN:[243,140],fN:[245,205],kF:[239,140],fF:[241,205],el:[250,32],ha:[236,26]} } },
-  { id:'extension', name:'Inclinarse hacia atrás', pos:'De pie', scale:0.8, dose:'10 veces',
-    how:['De pie, pies al ancho de las caderas, manos en la parte baja de la espalda.','Inclina el tronco hacia atrás despacio, solo un poco, mirando al frente.','Vuelve a la posición recta.'],
-    tip:'A algunas personas este movimiento las alivia y a otras les empeora. Si el dolor aumenta o baja por la pierna, salta este ejercicio.',
-    sets:1, reps:10, phases:[['Hacia atrás',3,'b'],['Vuelve',3,'a']],
-    poses:{ a:mk(T,{el:[185,55],ha:[196,78]}), b:mk(T,{head:[182,-10],sh:[186,15],mid:[196,45],hip:[206,76],el:[172,55],ha:[192,78]}) } },
-  { id:'marcha', name:'Marcha en el sitio', pos:'De pie', scale:0.8, dose:'3 minutos',
-    how:['De pie, cerca de una pared o un mueble para apoyarte si lo necesitas.','Marcha en el sitio a un ritmo cómodo, levantando un poco las rodillas.','También puedes cambiarlo por una caminata afuera.'],
-    tip:'Mantenerse activo es de lo que más ayuda con la ciática.',
-    loop:180, period:0.7,
-    poses:{ a:mk(T,{kF:[225,118],fF:[220,182],el:[196,45],ha:[190,78]}), b:mk(T,{kN:[230,118],fN:[225,182],el:[210,45],ha:[222,72]}) } },
+  { id:'atras', name:'Extensión hacia atrás', pos:'De pie', dose:'10 veces',
+    how:['De pie, con los pies separados y las manos en la parte baja de la espalda.','Inclina el tronco hacia atrás despacio, solo un poco, mirando al frente.','Vuelve a ponerte recto.'],
+    tip:'A algunas personas este movimiento las alivia y a otras les molesta. Si el dolor aumenta o baja por la pierna, sáltalo.',
+    sets:1, reps:10, phases:[['Hacia atrás',3,'b'],['Recto',3,'a']],
+    poses:{ a:mk(T,{el:[185,55],ha:[196,78]}), b:mk(T,{head:[168,-6],sh:[176,18],mid:[192,46],hip:[208,76],el:[164,58],ha:[190,80]}) } },
+  { id:'marcha', name:'Marcha en el sitio', pos:'De pie', dose:'3 minutos',
+    how:['De pie, cerca de una pared o un mueble por si necesitas apoyarte.','Marcha sin moverte del sitio, a un ritmo cómodo, levantando un poco las rodillas.','Si lo prefieres, puedes salir a caminar.'],
+    tip:'Mantenerte activo es de lo que más ayuda con la ciática.',
+    loop:180, period:0.8,
+    poses:{ a:mk(T,{kF:[232,110],fF:[226,176],el:[190,45],ha:[184,76]}), b:mk(T,{kN:[238,110],fN:[232,176],el:[214,44],ha:[228,70]}) } },
 ];
 
-// ---------- Guardar historial (solo en este teléfono) ----------
+// ---------- Historial (guardado solo en este teléfono) ----------
 const KEY = 'espalda-al-dia-v1';
 let store = { ack:false, days:{} };
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.days) store = s; } catch (e) {}
@@ -274,68 +279,79 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } c
 const dayKey = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 const today = () => dayKey(new Date());
 
-// ---------- Voz (español) ----------
+// ---------- Voz en español ----------
+// Solo usa una voz española; nunca deja que el teléfono lea el texto con otra voz.
 let voice = null;
-const pickVoice = () => {
-  const vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
-  voice = vs.find(v => /es[-_](419|US|MX|VE|CO)/i.test(v.lang)) || vs.find(v => /^es/i.test(v.lang)) || null;
-};
+function pickVoice() {
+  if (!window.speechSynthesis) return null;
+  const vs = speechSynthesis.getVoices().filter(v => /^es([-_]|$)/i.test(v.lang));
+  const score = v => (/google/i.test(v.name) ? 10 : 0) + (/(419|US|MX|CO|VE|AR|CL|PE)/i.test(v.lang) ? 3 : 0) + (/ES/.test(v.lang) ? 2 : 0) + (v.localService ? 1 : 0);
+  vs.sort((a, b) => score(b) - score(a));
+  voice = vs[0] || null;
+  $('noVoice').hidden = !!voice || speechSynthesis.getVoices().length === 0;
+  return voice;
+}
+const $ = id => document.getElementById(id);
 if (window.speechSynthesis) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
-const voiceOn = document.getElementById('voiceOn');
+const voiceOn = $('voiceOn');
 try { if (localStorage.getItem(KEY + '-voz') === '0') voiceOn.checked = false; } catch (e) {}
 voiceOn.addEventListener('change', () => { try { localStorage.setItem(KEY + '-voz', voiceOn.checked ? '1' : '0'); } catch (e) {} });
 function speak(text) {
   if (!voiceOn.checked || !window.speechSynthesis || !text) return;
+  if (!voice) pickVoice();
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = voice ? voice.lang : 'es-419'; if (voice) u.voice = voice; u.rate = 0.92;
+  u.lang = voice ? voice.lang : 'es-ES';
+  if (voice) u.voice = voice;
+  u.rate = 0.9;
   speechSynthesis.speak(u);
 }
+$('testVoice').onclick = () => speak('Hola. Esta es la voz que te va a guiar en los ejercicios.');
 
-// ---------- Ecrãs ----------
-const $ = id => document.getElementById(id);
+// ---------- Pantallas ----------
 const screens = ['home','safety','pain','ex','done'];
 function show(id) { screens.forEach(s => $(s).hidden = s !== id); window.scrollTo(0,0); }
 
-// ---------- Início ----------
+// ---------- Inicio ----------
 function renderHome() {
   const box = $('days'); box.innerHTML = '';
-  const names = ['D','L','M','X','J','V','S'];
-  let streak = 0, counting = true;
+  const names = ['Do','Lu','Ma','Mi','Ju','Vi','Sá'];
   for (let i = 13; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
-    const k = dayKey(d), done = store.days[k] && store.days[k].done;
+    const r = store.days[dayKey(d)];
     const el = document.createElement('div');
     el.textContent = names[d.getDay()] + ' ' + d.getDate();
-    if (done) el.className = 'done';
+    if (r && r.done) el.className = 'done';
     if (i === 0) el.classList.add('today');
     box.appendChild(el);
   }
+  let streak = 0;
   for (let i = 0; i < 365; i++) {
     const d = new Date(); d.setDate(d.getDate() - i);
     const r = store.days[dayKey(d)];
     if (r && r.done) streak++; else if (i > 0) break;
   }
-  $('streak').textContent = streak > 0 ? (streak === 1 ? 'Llevas 1 día seguido. ¡Sigue así!' : 'Llevas ' + streak + ' días seguidos. ¡Sigue así!') : 'Todavía no hay días registrados. Hoy es un buen día para empezar.';
+  $('streak').textContent = streak === 0 ? 'Aún no has hecho ningún día. ¡Hoy es un buen día para empezar!'
+    : streak === 1 ? 'Llevas 1 día. ¡Sigue así!' : 'Llevas ' + streak + ' días seguidos. ¡Sigue así!';
   $('exList').innerHTML = EX.map(e => '<li>' + e.name + ' <span class="muted">(' + e.dose + ')</span></li>').join('');
 }
-
-$('startBtn').onclick = () => { if (!store.ack) { show('safety'); } else { askPain('before'); } };
+$('startBtn').onclick = () => { if (!store.ack) show('safety'); else askPain('before'); };
 $('safetyBtn').onclick = () => show('safety');
 $('ackBtn').onclick = () => { store.ack = true; save(); askPain('before'); };
 $('homeBtn').onclick = () => { renderHome(); show('home'); };
 
-// ---------- Dor antes/depois ----------
-const PAIN = [[0,'Sin dolor','#2f9e5b'],[3,'Poco dolor','#8cbf3f'],[5,'Dolor medio','#e0b100'],[7,'Dolor fuerte','#e07a1f'],[9,'Dolor muy fuerte','#c8361b']];
+// ---------- Dolor antes y después ----------
+const PAIN = [[0,'Nada','#2f9e5b'],[3,'Un poco','#8cbf3f'],[5,'Regular','#e0b100'],[7,'Bastante','#e07a1f'],[9,'Muchísimo','#c8361b']];
 let painMode = 'before', session = null;
 function askPain(mode) {
   painMode = mode;
-  $('painTitle').textContent = mode === 'before' ? '¿Cómo está el dolor ahora, antes de empezar?' : '¿Y ahora, después de los ejercicios?';
+  $('painTitle').textContent = mode === 'before' ? '¿Cuánto te duele ahora?' : '¿Y cuánto te duele ahora, después de los ejercicios?';
   $('painNote').hidden = true; $('painGo').hidden = true;
   $('painBtns').innerHTML = '';
-  PAIN.forEach(([v,label,col]) => {
+  PAIN.forEach(([v, label, col]) => {
     const b = document.createElement('button');
-    b.className = 'btn'; b.innerHTML = '<span class="dot" style="background:' + col + '"></span>' + label;
+    b.className = 'btn';
+    b.innerHTML = '<span class="dot" style="background:' + col + '"></span>' + label;
     b.onclick = () => pickPain(v);
     $('painBtns').appendChild(b);
   });
@@ -347,9 +363,8 @@ function pickPain(v) {
     rec.painBefore = v; save();
     session = { i:0, hurt:[] };
     if (v >= 9) {
-      $('painNote').textContent = 'Con dolor muy fuerte, haz solo lo que puedas, más despacio, y salta lo que duela. Si este dolor es nuevo o distinto de lo habitual, habla con el médico.';
-      $('painNote').hidden = false; $('painGo').hidden = false;
-      $('painBtns').innerHTML = '';
+      $('painNote').textContent = 'Si hoy te duele mucho, haz solo lo que puedas, más despacio, y sáltate lo que te moleste. Si es un dolor nuevo o diferente al de siempre, consulta con el médico.';
+      $('painNote').hidden = false; $('painGo').hidden = false; $('painBtns').innerHTML = '';
       return;
     }
     openEx(0);
@@ -360,68 +375,125 @@ function pickPain(v) {
 }
 $('painGo').onclick = () => openEx(0);
 
-// ---------- Desenho da figura ----------
+// ---------- Dibujo de la figura ----------
 const cv = $('fig'), ctx = cv.getContext('2d');
-let cur = null, from = null, to = null, tStart = 0, tDur = 1, exNow = null;
+let cur = null, from = null, to = null, tStart = 0, tDur = 1, exNow = null, view = null, moving = new Set(), arrow = null;
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const ease = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
+const clone = o => JSON.parse(JSON.stringify(o));
+
+// Encuadre automático: la figura ocupa todo el dibujo
+function fitView(ex) {
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = 208;
+  [ex.poses.a, ex.poses.b].forEach(p => { for (const k in p) {
+    const r = k === 'head' ? 16 : 8;
+    x0 = Math.min(x0, p[k][0]-r); x1 = Math.max(x1, p[k][0]+r); y0 = Math.min(y0, p[k][1]-r); y1 = Math.max(y1, p[k][1]+r);
+  }});
+  if (ex.chair) { x0 = Math.min(x0, 132); y0 = Math.min(y0, 66); }
+  const pad = 22, w = x1 - x0 + pad*2, h = y1 - y0 + pad*2;
+  const s = Math.min(400 / w, 300 / h);
+  view = { s, ox: (400 - (x1 - x0) * s) / 2 - x0 * s, oy: (300 - (y1 - y0) * s) / 2 - y0 * s };
+  // Puntos que se mueven y la flecha del movimiento principal
+  moving = new Set(); let best = null, bestD = 0;
+  for (const k in ex.poses.a) {
+    const a = ex.poses.a[k], b = ex.poses.b[k], d = Math.hypot(a[0]-b[0], a[1]-b[1]);
+    if (d > 7) moving.add(k);
+    if (d > bestD && k !== 'head') { bestD = d; best = k; }
+  }
+  arrow = best ? { a: ex.poses.a[best], b: ex.poses.b[best] } : null;
+}
 function setTarget(pose, dur) {
-  from = cur ? JSON.parse(JSON.stringify(cur)) : JSON.parse(JSON.stringify(pose));
+  from = cur ? clone(cur) : clone(pose);
   to = pose; tStart = performance.now(); tDur = Math.max(0.25, dur) * 1000;
+}
+const SEG = [['hip','kF'],['kF','fF'],['sh','mid'],['mid','hip'],['hip','kN'],['kN','fN'],['sh','el'],['el','ha'],['head','sh']];
+function drawBody(p, opts) {
+  const lw = { far:13, torso:18, near:15, arm:11, neck:9 };
+  const seg = (a, b, w, col) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(...p[a]); ctx.lineTo(...p[b]); ctx.stroke(); };
+  const colFor = (a, b, base) => opts.ghost ? opts.ghost : ((moving.has(a) || moving.has(b)) && !(a === 'head' || b === 'head') ? opts.move : base);
+  const farCol = opts.ghost || ((moving.has('kF') || moving.has('fF')) ? opts.moveFar : opts.far);
+  seg('hip','kF', lw.far, farCol); seg('kF','fF', lw.far, farCol);
+  seg('head','sh', lw.neck, opts.ghost || opts.fig);
+  seg('sh','mid', lw.torso, colFor('sh','mid', opts.fig)); seg('mid','hip', lw.torso, colFor('mid','hip', opts.fig));
+  seg('hip','kN', lw.near, colFor('hip','kN', opts.fig)); seg('kN','fN', lw.near, colFor('kN','fN', opts.fig));
+  seg('sh','el', lw.arm, colFor('sh','el', opts.fig)); seg('el','ha', lw.arm, colFor('el','ha', opts.fig));
+  if (opts.feet) {
+    const foot = (k, w, col) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(...p[k]); ctx.lineTo(p[k][0] + 18, p[k][1]); ctx.stroke(); };
+    foot('fF', lw.far, farCol); foot('fN', lw.near, colFor('kN','fN', opts.fig));
+  }
+  ctx.fillStyle = opts.ghost || (moving.has('head') ? opts.move : opts.fig);
+  ctx.beginPath(); ctx.arc(p.head[0], p.head[1], 16, 0, Math.PI*2); ctx.fill();
 }
 function draw() {
   if (to) {
-    const p = Math.min(1, (performance.now() - tStart) / tDur), e = ease(p);
+    const e = ease(Math.min(1, (performance.now() - tStart) / tDur));
     cur = {}; for (const k in to) cur[k] = [from[k][0] + (to[k][0]-from[k][0])*e, from[k][1] + (to[k][1]-from[k][1])*e];
   }
-  const W = cv.width, H = cv.height, s = W / 400;
+  const W = cv.width, H = cv.height, k = W / 400;
   ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,W,H);
-  ctx.setTransform(s,0,0,s,0,0);
-  const sc = (exNow && exNow.scale) || 1;
-  ctx.translate(200, 205); ctx.scale(sc, sc); ctx.translate(-200, -205);
+  if (!view || !cur) return;
+  ctx.setTransform(k * view.s, 0, 0, k * view.s, k * view.ox, k * view.oy);
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  // chão
-  ctx.strokeStyle = css('--floor'); ctx.lineWidth = 4 / sc;
-  ctx.beginPath(); ctx.moveTo(-200, 208); ctx.lineTo(600, 208); ctx.stroke();
-  if (exNow && exNow.chair) {
-    ctx.strokeStyle = css('--floor'); ctx.lineWidth = 7;
-    ctx.beginPath(); ctx.moveTo(140,72); ctx.lineTo(140,150); ctx.lineTo(212,150); ctx.moveTo(146,150); ctx.lineTo(146,206); ctx.moveTo(206,150); ctx.lineTo(206,206); ctx.stroke();
+  const s = view.s;
+  // suelo
+  ctx.strokeStyle = css('--floor'); ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(-400, 211); ctx.lineTo(800, 211); ctx.stroke();
+  if (exNow.chair) {
+    ctx.strokeStyle = css('--floor'); ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.moveTo(140,72); ctx.lineTo(140,150); ctx.lineTo(212,150); ctx.moveTo(146,150); ctx.lineTo(146,209); ctx.moveTo(206,150); ctx.lineTo(206,209); ctx.stroke();
   }
-  if (!cur) return;
-  const line = (pts, col, w) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(...cur[pts[0]]); pts.slice(1).forEach(k => ctx.lineTo(...cur[k])); ctx.stroke(); };
-  const fig = css('--figure'), far = css('--figure-far');
-  line(['hip','kF','fF'], far, 12);
-  line(['sh','mid','hip'], fig, 16);
-  line(['hip','kN','fN'], fig, 13);
-  line(['sh','el','ha'], fig, 10);
-  ctx.fillStyle = fig; ctx.beginPath(); ctx.arc(cur.head[0], cur.head[1], 14, 0, Math.PI*2); ctx.fill();
-  ctx.strokeStyle = fig; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(...cur.head); ctx.lineTo(...cur.sh); ctx.stroke();
+  const feet = exNow.pos !== 'Acostado boca arriba';
+  const opts = { fig: css('--figure'), far: css('--figure-far'), move: css('--move'), moveFar: css('--move'), feet };
+  // sombra de la posición a la que hay que llegar
+  drawBody(exNow.poses.b, { ghost: css('--ghost'), feet });
+  // flecha del movimiento
+  if (arrow) {
+    const [ax, ay] = arrow.a, [bx, by] = arrow.b;
+    const mx = (ax + bx) / 2, my = (ay + by) / 2, dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy);
+    const nx = -dy / len, ny = dx / len, off = Math.min(28, len * 0.35);
+    const cx = mx + nx * off, cy = my + ny * off;
+    const t = 0.82, ex1 = (1-t)*(1-t)*ax + 2*(1-t)*t*cx + t*t*bx, ey1 = (1-t)*(1-t)*ay + 2*(1-t)*t*cy + t*t*by;
+    ctx.strokeStyle = css('--move'); ctx.lineWidth = 4; ctx.setLineDash([8, 7]);
+    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.quadraticCurveTo(cx, cy, ex1, ey1); ctx.stroke(); ctx.setLineDash([]);
+    const px = (1-0.7)*(1-0.7)*ax + 2*(1-0.7)*0.7*cx + 0.7*0.7*bx, py = (1-0.7)*(1-0.7)*ay + 2*(1-0.7)*0.7*cy + 0.7*0.7*by;
+    const a2 = Math.atan2(ey1 - py, ex1 - px), h = 12;
+    ctx.fillStyle = css('--move'); ctx.beginPath();
+    ctx.moveTo(ex1 + Math.cos(a2)*h, ey1 + Math.sin(a2)*h);
+    ctx.lineTo(ex1 + Math.cos(a2 + 2.5)*h, ey1 + Math.sin(a2 + 2.5)*h);
+    ctx.lineTo(ex1 + Math.cos(a2 - 2.5)*h, ey1 + Math.sin(a2 - 2.5)*h);
+    ctx.closePath(); ctx.fill();
+  }
+  drawBody(cur, opts);
 }
 (function loop() { draw(); requestAnimationFrame(loop); })();
 
-// Demonstração enquanto o exercício ainda não começou
+// Demostración mientras el ejercicio no ha empezado
 let demoTimer = null;
 function startDemo(ex) {
   stopDemo();
   let k = 0;
-  const steps = ex.loop ? [['', ex.period, 'b'], ['', ex.period, 'a']] : ex.phases;
+  const steps = ex.loop ? [['', ex.period, 'b'], ['', ex.period, 'a']] : [['', 1.6, 'b'], ['', 1.6, 'a']];
   const next = () => {
     const ph = steps[k % steps.length]; k++;
-    const t = Math.min(2.5, ph[1]);
-    setTarget(ex.poses[ph[2]], Math.min(1.2, t * 0.8));
-    demoTimer = setTimeout(next, t * 1000);
+    setTarget(ex.poses[ph[2]], ex.loop ? ph[1] * 0.9 : 1.2);
+    demoTimer = setTimeout(next, ph[1] * 1000);
   };
   next();
 }
 function stopDemo() { clearTimeout(demoTimer); demoTimer = null; }
 
-// ---------- Exercício ----------
+// ---------- Ejercicio ----------
+const POS_MSG = {
+  'Acostado boca arriba': 'Acuéstate boca arriba en una cama firme o en una colchoneta.',
+  'Sentado en una silla': 'Ahora levántate con calma y siéntate en una silla firme.',
+  'De pie': 'Ahora levántate con calma y ponte de pie cerca de algo donde apoyarte.'
+};
 function openEx(i) {
   stopRun();
   if (i >= EX.length) { askPain('after'); return; }
   session.i = i;
   const ex = EX[i], prev = EX[i-1];
-  exNow = ex; cur = null;
+  exNow = ex; cur = null; fitView(ex);
   $('exCount').textContent = (i+1) + ' de ' + EX.length;
   $('exBar').style.width = (i / EX.length * 100) + '%';
   $('exName').textContent = ex.name;
@@ -430,32 +502,30 @@ function openEx(i) {
   $('exHow').innerHTML = ex.how.map(h => '<li>' + h + '</li>').join('');
   $('exTip').textContent = ex.tip;
   const moved = !prev || prev.pos !== ex.pos;
-  const posMsg = { 'Acostado boca arriba':'Acuéstate boca arriba en una cama firme o una colchoneta.', 'Sentado en una silla':'Ahora levántate con calma y siéntate en una silla firme.', 'De pie':'Ahora levántate con calma y quédate de pie, cerca de un apoyo.' }[ex.pos];
-  $('moveNote').hidden = !moved; $('moveNote').textContent = posMsg;
+  $('moveNote').hidden = !moved; $('moveNote').textContent = POS_MSG[ex.pos];
   $('idle').hidden = false; $('running').hidden = true;
   $('idleBtns').hidden = false; $('runBtns').hidden = true;
   setTarget(ex.poses.a, 0.3);
   startDemo(ex);
   show('ex');
-  if (i > 0) speak((moved ? posMsg + ' ' : '') + 'Siguiente ejercicio: ' + ex.name + '. Cuando estés listo, pulsa Empezar.');
-  else speak(posMsg + ' Primer ejercicio: ' + ex.name + '. Cuando estés listo, pulsa Empezar.');
+  speak((moved ? POS_MSG[ex.pos] + ' ' : '') + (i === 0 ? 'Primer ejercicio: ' : 'Siguiente ejercicio: ') + ex.name + '. Cuando estés listo, toca Empezar.');
 }
 $('listenBtn').onclick = () => { const ex = EX[session.i]; speak(ex.name + '. ' + ex.how.join(' ') + ' ' + ex.tip); };
 $('skipBtn').onclick = () => openEx(session.i + 1);
 $('quitBtn').onclick = () => { stopRun(); stopDemo(); if (window.speechSynthesis) speechSynthesis.cancel(); renderHome(); show('home'); };
 
-// Constrói a sequência de passos de um exercício
+// Secuencia de pasos de un ejercicio
 function buildSteps(ex) {
   const st = [];
-  if (ex.loop) { st.push({ say:'Marcha', t:ex.loop, pose:'b', loop:true, info:'' }); return st; }
+  if (ex.loop) { st.push({ say:'A marchar', t:ex.loop, pose:'b', loop:true, info:'' }); return st; }
   const sides = ex.sides ? ['derecha','izquierda'] : [null];
   sides.forEach((side, si) => {
     for (let s = 0; s < ex.sets; s++) {
-      if (si > 0 && s === 0) st.push({ say:'Descansa. Ahora sigue la pierna izquierda.', label:'Descansa', t:ex.rest || 8, pose:'a', rest:true, info:'Después: pierna izquierda' });
-      else if (s > 0) st.push({ say:'Descansa un poco.', label:'Descansa', t:ex.rest || 10, pose:'a', rest:true, info:'Después: serie ' + (s+1) + ' de ' + ex.sets });
+      if (si > 0 && s === 0) st.push({ say:'Descansa. Ahora vamos con la pierna izquierda.', label:'Descansa', t:ex.rest || 8, pose:'a', info:'Después: pierna izquierda' });
+      else if (s > 0) st.push({ say:'Descansa un momento.', label:'Descansa', t:ex.rest || 10, pose:'a', info:'Después: serie ' + (s+1) + ' de ' + ex.sets });
       for (let r = 0; r < ex.reps; r++) {
         ex.phases.forEach(([say, t, pose], pi) => {
-          let info = 'Vez ' + (r+1) + ' de ' + ex.reps;
+          let info = 'Repetición ' + (r+1) + ' de ' + ex.reps;
           if (ex.sets > 1) info += ' · Serie ' + (s+1) + ' de ' + ex.sets;
           if (side) info += ' · Pierna ' + side;
           st.push({ say, t, pose, info, first: r === 0 && pi === 0 && s === 0, side });
@@ -470,8 +540,7 @@ let run = null;
 function stopRun() { if (run) { clearInterval(run.timer); run = null; } releaseWake(); }
 $('goBtn').onclick = () => {
   stopDemo();
-  const ex = EX[session.i];
-  run = { steps: buildSteps(ex), k: -1, left: 0, paused: false, last: performance.now(), lastSec: null, flip: 0 };
+  run = { steps: buildSteps(EX[session.i]), k: -1, left: 0, paused: false, last: performance.now(), lastSec: null, flip: 0 };
   $('idle').hidden = true; $('running').hidden = false;
   $('idleBtns').hidden = true; $('runBtns').hidden = false;
   $('pauseBtn').textContent = 'Pausa';
@@ -487,26 +556,24 @@ function nextStep() {
   setTarget(ex.poses[st.pose], Math.min(1.4, st.t * 0.7));
   $('runSay').textContent = st.label || st.say;
   $('runInfo').textContent = st.info;
-  let words = st.say;
-  if (st.first && st.side) words = 'Pierna ' + st.side + '. ' + words;
-  speak(words);
+  speak(st.first && st.side ? 'Pierna ' + st.side + '. ' + st.say : st.say);
 }
 function tick() {
-  if (!run || run.paused) { if (run) run.last = performance.now(); return; }
+  if (!run) return;
   const now = performance.now(), dt = (now - run.last) / 1000; run.last = now;
+  if (run.paused) return;
   run.left -= dt;
   const st = run.steps[run.k], ex = EX[session.i];
   if (st.loop) {
     run.flip += dt;
-    if (run.flip >= ex.period) { run.flip = 0; const nextPose = to === ex.poses.a ? ex.poses.b : ex.poses.a; setTarget(nextPose, ex.period * 0.9); }
-    const m = Math.floor(Math.max(0, run.left) / 60), s = Math.ceil(Math.max(0, run.left) % 60);
-    $('runNum').textContent = m + ':' + String(s === 60 ? 0 : s).padStart(2,'0');
-    const sec = Math.ceil(run.left);
-    if (sec !== run.lastSec) { run.lastSec = sec; if (sec === 120) speak('Faltan dos minutos.'); if (sec === 60) speak('Falta un minuto.'); if (sec === 10) speak('Faltan diez segundos.'); }
+    if (run.flip >= ex.period) { run.flip = 0; setTarget(to === ex.poses.a ? ex.poses.b : ex.poses.a, ex.period * 0.9); }
+    const left = Math.max(0, Math.ceil(run.left)), m = Math.floor(left / 60), s = left % 60;
+    $('runNum').textContent = m + ':' + String(s).padStart(2,'0');
+    if (left !== run.lastSec) { run.lastSec = left; if (left === 120) speak('Quedan dos minutos.'); if (left === 60) speak('Queda un minuto.'); if (left === 10) speak('Quedan diez segundos.'); }
   } else {
     const sec = Math.max(0, Math.ceil(run.left));
     $('runNum').textContent = sec;
-    if (st.t >= 10 && sec !== run.lastSec && sec <= 3 && sec >= 1) speak(['','uno','dos','tres'][sec]);
+    if (st.t >= 10 && sec !== run.lastSec && sec >= 1 && sec <= 3) speak(['','uno','dos','tres'][sec]);
     run.lastSec = sec;
   }
   if (run.left <= 0) nextStep();
@@ -514,14 +581,14 @@ function tick() {
 $('pauseBtn').onclick = () => {
   if (!run) return;
   run.paused = !run.paused;
-  $('pauseBtn').textContent = run.paused ? 'Continuar' : 'Pausa';
-  speak(run.paused ? 'En pausa.' : 'Seguimos.');
+  $('pauseBtn').textContent = run.paused ? 'Seguir' : 'Pausa';
+  speak(run.paused ? 'Pausa.' : 'Seguimos.');
 };
 $('hurtBtn').onclick = () => {
   const ex = EX[session.i];
   if (!session.hurt.includes(ex.name)) session.hurt.push(ex.name);
-  stopRun(); speak('Está bien, saltamos este.');
-  setTimeout(() => openEx(session.i + 1), 1200);
+  stopRun(); speak('Está bien. Nos saltamos este.');
+  setTimeout(() => openEx(session.i + 1), 1500);
 };
 function exerciseDone() {
   stopRun();
@@ -530,22 +597,23 @@ function exerciseDone() {
   setTimeout(() => openEx(session.i + 1), 1600);
 }
 
-// Ecrã sempre ligado durante o exercício (se o telemóvel deixar)
+// Mantener la pantalla encendida durante el ejercicio (si el teléfono lo permite)
 let wake = null;
 async function requestWake() { try { if ('wakeLock' in navigator) wake = await navigator.wakeLock.request('screen'); } catch (e) { wake = null; } }
 function releaseWake() { try { if (wake) wake.release(); } catch (e) {} wake = null; }
 
-// ---------- Fim ----------
+// ---------- Fin ----------
 function finish() {
   const rec = store.days[today()] || {};
   const label = v => (PAIN.find(p => p[0] === v) || [0,'—'])[1].toLowerCase();
   let txt = 'Antes: ' + label(rec.painBefore) + '. Después: ' + label(rec.painAfter) + '.';
   if (rec.painAfter < rec.painBefore) txt += ' El dolor bajó. ¡Excelente!';
-  else if (rec.painAfter > rec.painBefore) txt += ' El dolor subió. Mañana hazlo más despacio y salta lo que duela. Si sigue así, habla con el médico.';
+  else if (rec.painAfter > rec.painBefore) txt += ' El dolor subió. Mañana hazlos más despacio y sáltate los que te molesten.';
+  else txt += ' El dolor se mantuvo igual.';
   $('painCompare').textContent = txt;
   $('hurtCard').hidden = !(session && session.hurt.length);
   $('hurtList').innerHTML = session ? session.hurt.map(h => '<li>' + h + '</li>').join('') : '';
-  speak('¡Muy bien! Los ejercicios de hoy están hechos.');
+  speak('¡Muy bien! Terminaste los ejercicios de hoy.');
   show('done');
 }
 
