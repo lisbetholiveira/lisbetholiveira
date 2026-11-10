@@ -30,12 +30,14 @@ Que ele consiga fazer sozinho, todos os dias, cerca de 25 minutos de exercícios
 Formato: nome | dose | fases (palavra falada, segundos) | instruções | dica.
 
 **Bloco 1 — Sentado en una silla**
+
 1. **Giro de tronco sentado** | 3 × 15 s para cada lado | Gira 3 · Aguanta 15 · Al frente 3 | Siéntate en una silla firme, con la espalda recta y los pies apoyados en el suelo. / Gira el tronco despacio hacia un lado y agárrate del respaldo de la silla. / Aguanta respirando tranquilo y vuelve al frente. | Gira desde la cintura, sin forzar el cuello.
 2. **Inclinación hacia un lado** | 3 × 10 s para cada lado | Inclínate 3 · Aguanta 10 · Al centro 3 | Sentado con la espalda recta, levanta un brazo por encima de la cabeza. / Inclina el tronco despacio hacia el lado contrario. / Aguanta respirando tranquilo y vuelve al centro. | Notarás un estiramiento suave en el costado. No te inclines hacia delante.
 3. **Deslizamiento del nervio (sentado)** | 10 com cada perna | Estira y mira arriba 2 · Dobla y mira abajo 2 | Siéntate en el borde de una silla firme, con la espalda recta. / Estira una rodilla y, a la vez, mira hacia arriba. / Después dobla la rodilla y mira hacia abajo. Suave, sin aguantar. | Usa una silla sin ruedas, pegada a la pared.
 4. **Levantarse de la silla** | 2 séries de 6 | Arriba 3 · Siéntate despacio 3 | Cruza los brazos sobre el pecho y apoya bien los pies en el suelo. / Échate un poco hacia delante y ponte de pie con la fuerza de las piernas. / Siéntate despacio, controlando la bajada. Si lo necesitas, apóyate con las manos. | Fortalece las piernas y te ayuda en el día a día.
 
 **Bloco 2 — Acostado boca arriba**
+
 5. **Respiración profunda** | 6 respirações | Toma aire 4 · Suelta el aire 5 | Acuéstate boca arriba con las rodillas dobladas y los pies apoyados. / Pon las manos sobre la barriga. / Toma aire por la nariz inflando la barriga, y suéltalo despacio por la boca. | Sirve para relajar los músculos antes de empezar.
 6. **Basculación de la pelvis** | 2 séries de 8 | Aplana la espalda 2 · Aguanta 3 · Relaja 3 | Rodillas dobladas y pies apoyados en el suelo. / Aplana la parte baja de la espalda contra el suelo, metiendo la barriga. / Aguanta un momento y relaja. Es un movimiento pequeño. | Respira con normalidad. No aguantes el aire.
 7. **Rodilla al pecho** | 3 × 20 s com cada perna | Rodilla al pecho 3 · Aguanta 20 · Suelta 4 | Abraza una rodilla con las dos manos. / Llévala despacio hacia el pecho. La otra pierna sigue doblada. / Notarás un estiramiento suave en la espalda y en el glúteo. | Lleva la rodilla solo hasta donde te resulte cómodo.
@@ -46,6 +48,7 @@ Formato: nome | dose | fases (palavra falada, segundos) | instruções | dica.
 12. **Estiramiento del glúteo** | 2 × 20 s com cada perna | Acerca las piernas 3 · Aguanta 20 · Suelta 5 | Cruza un tobillo sobre la rodilla contraria, formando un 4. / Agarra el muslo de la pierna de abajo y acerca las dos piernas al pecho. / Notarás el estiramiento en el glúteo. Respira tranquilo. | Si no llegas al muslo, ayúdate con una toalla.
 
 **Bloco 3 — De pie**
+
 13. **Extensión hacia atrás** | 10 vezes | Hacia atrás 3 · Recto 3 | De pie, con los pies separados y las manos en la parte baja de la espalda. / Inclina el tronco hacia atrás despacio, solo un poco, mirando al frente. / Vuelve a ponerte recto. | A algunas personas este movimiento las alivia y a otras les molesta. Si el dolor aumenta o baja por la pierna, sáltalo.
 14. **Marcha en el sitio** | 3 minutos contínuos (a voz avisa "Quedan dos minutos.", "Queda un minuto." e "Quedan diez segundos.") | De pie, cerca de una pared o un mueble por si necesitas apoyarte. / Marcha sin moverte del sitio, a un ritmo cómodo, levantando un poco las rodillas. / Si lo prefieres, puedes salir a caminar. | Mantenerte activo es de lo que más ayuda con la ciática.
 
