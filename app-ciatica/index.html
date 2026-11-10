@@ -107,7 +107,7 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
     <p class="muted">¡Hola!</p>
     <h1>Ejercicios para la ciática</h1>
   </div>
-  <p>Unos <b>20 minutos</b>. Un ejercicio a la vez: la app te explica cada uno en voz alta y te lleva el tiempo.</p>
+  <p>Unos <b>25 minutos</b>. Un ejercicio a la vez: la app te explica cada uno en voz alta y te lleva el tiempo.</p>
   <p class="notice soft" id="noVoice" hidden>Este teléfono no tiene voz en español. Para activarla: Ajustes › Sistema › Idioma › Texto a voz › Motor de Google › Instalar datos de voz › Español.</p>
   <button class="btn primary" id="startBtn">Empezar</button>
   <div class="card">
@@ -150,7 +150,7 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
 <!-- EJERCICIO -->
 <section id="ex" class="wrap" hidden>
   <div class="top">
-    <span class="count" id="exCount">1 de 11</span>
+    <span class="count" id="exCount">1 de 14</span>
     <div class="bar"><i id="exBar"></i></div>
     <button class="x" id="quitBtn">Salir</button>
   </div>
@@ -211,9 +211,32 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
 const mk = (base, o) => Object.assign({}, base, o);
 const S = { head:[70,190], sh:[100,193], mid:[150,195], hip:[200,194], kN:[250,145], fN:[292,198], kF:[246,148], fF:[286,198], el:[140,200], ha:[180,200] };
 const C = { head:[170,48], sh:[172,75], mid:[170,105], hip:[172,138], kN:[240,138], fN:[245,203], kF:[236,140], fF:[240,203], el:[178,110], ha:[205,130] };
+// Vista de frente, sentado (para la inclinación lateral)
+const F_A = { head:[200,44], sh:[200,74], mid:[200,106], hip:[200,140], kN:[222,150], fN:[224,205], kF:[178,150], fF:[176,205], el:[232,50], ha:[226,10] };
+const F_B = { head:[176,52], sh:[186,78], mid:[195,108], hip:[200,140], kN:[222,150], fN:[224,205], kF:[178,150], fF:[176,205], el:[212,38], ha:[184,8] };
 const T = { head:[200,-14], sh:[200,12], mid:[202,45], hip:[203,75], kN:[205,140], fN:[205,205], kF:[198,140], fF:[198,205], el:[205,45], ha:[208,78] };
 
 const EX = [
+  { id:'torsion', name:'Giro de tronco sentado', pos:'Sentado en una silla', chair:true, dose:'3 veces 15 segundos, hacia cada lado',
+    how:['Siéntate en una silla firme, con la espalda recta y los pies apoyados en el suelo.','Gira el tronco despacio hacia un lado y agárrate del respaldo de la silla.','Aguanta respirando tranquilo y vuelve al frente.'],
+    tip:'Gira desde la cintura, sin forzar el cuello.',
+    sides:true, sideWord:'Lado', sideNames:['derecho','izquierdo'], sets:1, reps:3, rest:8, phases:[['Gira',3,'b'],['Aguanta',15,'b'],['Al frente',3,'a']],
+    poses:{ a:mk(C,{el:[196,112],ha:[228,132]}), b:mk(C,{head:[162,48],sh:[166,76],el:[150,104],ha:[143,82]}) } },
+  { id:'lateral', name:'Inclinación hacia un lado', pos:'Sentado en una silla', chair:'front', front:true, dose:'3 veces 10 segundos, hacia cada lado',
+    how:['Sentado con la espalda recta, levanta un brazo por encima de la cabeza.','Inclina el tronco despacio hacia el lado contrario.','Aguanta respirando tranquilo y vuelve al centro.'],
+    tip:'Notarás un estiramiento suave en el costado. No te inclines hacia delante.',
+    sides:true, sideWord:'Lado', sideNames:['derecho','izquierdo'], sets:1, reps:3, rest:8, phases:[['Inclínate',3,'b'],['Aguanta',10,'b'],['Al centro',3,'a']],
+    poses:{ a:F_A, b:F_B } },
+  { id:'nervio2', name:'Deslizamiento del nervio (sentado)', pos:'Sentado en una silla', chair:true, dose:'10 veces con cada pierna',
+    how:['Siéntate en el borde de una silla firme, con la espalda recta.','Estira una rodilla y, a la vez, mira hacia arriba.','Después dobla la rodilla y mira hacia abajo. Suave, sin aguantar.'],
+    tip:'Usa una silla sin ruedas, pegada a la pared.',
+    sides:true, sets:1, reps:10, rest:10, phases:[['Estira y mira arriba',2,'b'],['Dobla y mira abajo',2,'a']],
+    poses:{ a:mk(C,{head:[188,58]}), b:mk(C,{head:[160,42],fN:[306,126]}) } },
+  { id:'silla', name:'Levantarse de la silla', pos:'Sentado en una silla', chair:true, dose:'2 series de 6',
+    how:['Cruza los brazos sobre el pecho y apoya bien los pies en el suelo.','Échate un poco hacia delante y ponte de pie con la fuerza de las piernas.','Siéntate despacio, controlando la bajada. Si lo necesitas, apóyate con las manos.'],
+    tip:'Fortalece las piernas y te ayuda en el día a día.',
+    sets:2, reps:6, rest:15, phases:[['Arriba',3,'b'],['Siéntate despacio',3,'a']],
+    poses:{ a:mk(C,{el:[190,95],ha:[176,88]}), b:{head:[234,-14],sh:[234,12],mid:[236,45],hip:[238,75],kN:[243,140],fN:[245,205],kF:[239,140],fF:[241,205],el:[250,32],ha:[236,26]} } },
   { id:'resp', name:'Respiración profunda', pos:'Acostado boca arriba', dose:'6 respiraciones lentas',
     how:['Acuéstate boca arriba con las rodillas dobladas y los pies apoyados.','Pon las manos sobre la barriga.','Toma aire por la nariz inflando la barriga, y suéltalo despacio por la boca.'],
     tip:'Sirve para relajar los músculos antes de empezar.',
@@ -229,6 +252,11 @@ const EX = [
     tip:'Lleva la rodilla solo hasta donde te resulte cómodo.',
     sides:true, sets:1, reps:3, rest:10, phases:[['Rodilla al pecho',3,'b'],['Aguanta',20,'b'],['Suelta',4,'a']],
     poses:{ a:S, b:mk(S,{kN:[178,124],fN:[234,144],el:[135,168],ha:[170,134]}) } },
+  { id:'circulos', name:'Círculos con las rodillas', pos:'Acostado boca arriba', dose:'1 minuto',
+    how:['Lleva las dos rodillas hacia el pecho y pon una mano en cada rodilla.','Haz círculos pequeños y lentos con las rodillas.','A la mitad del tiempo, cambia de sentido.'],
+    tip:'Es un masaje suave para la parte baja de la espalda.',
+    loop:60, period:1.3, loopSay:'Círculos pequeños', cues:{30:'Ahora en el otro sentido.',10:'Quedan diez segundos.'},
+    poses:{ a:mk(S,{kN:[190,128],fN:[238,140],kF:[186,131],fF:[234,143],el:[150,170],ha:[188,132]}), b:mk(S,{kN:[214,120],fN:[262,132],kF:[210,123],fF:[258,135],el:[160,166],ha:[210,126]}) } },
   { id:'giro', name:'Giro de rodillas', pos:'Acostado boca arriba', dose:'6 veces hacia cada lado',
     how:['Junta las rodillas.','Déjalas caer despacio hacia un lado, solo hasta donde te resulte cómodo. Los hombros no se despegan del suelo.','Vuelve al centro y repite hacia el otro lado.'],
     tip:'Hazlo lento, sin impulso.',
@@ -249,16 +277,6 @@ const EX = [
     tip:'Si no llegas al muslo, ayúdate con una toalla.',
     sides:true, sets:1, reps:2, rest:10, phases:[['Acerca las piernas',3,'b'],['Aguanta',20,'b'],['Suelta',5,'a']],
     poses:{ a:mk(S,{kN:[235,135],fN:[248,142]}), b:mk(S,{kF:[205,125],fF:[258,150],kN:[192,112],fN:[212,124],el:[155,160],ha:[205,132]}) } },
-  { id:'nervio2', name:'Deslizamiento del nervio (sentado)', pos:'Sentado en una silla', chair:true, dose:'10 veces con cada pierna',
-    how:['Siéntate en el borde de una silla firme, con la espalda recta.','Estira una rodilla y, a la vez, mira hacia arriba.','Después dobla la rodilla y mira hacia abajo. Suave, sin aguantar.'],
-    tip:'Usa una silla sin ruedas, pegada a la pared.',
-    sides:true, sets:1, reps:10, rest:10, phases:[['Estira y mira arriba',2,'b'],['Dobla y mira abajo',2,'a']],
-    poses:{ a:mk(C,{head:[188,58]}), b:mk(C,{head:[160,42],fN:[306,126]}) } },
-  { id:'silla', name:'Levantarse de la silla', pos:'Sentado en una silla', chair:true, dose:'2 series de 6',
-    how:['Cruza los brazos sobre el pecho y apoya bien los pies en el suelo.','Échate un poco hacia delante y ponte de pie con la fuerza de las piernas.','Siéntate despacio, controlando la bajada. Si lo necesitas, apóyate con las manos.'],
-    tip:'Fortalece las piernas y te ayuda en el día a día.',
-    sets:2, reps:6, rest:15, phases:[['Arriba',3,'b'],['Siéntate despacio',3,'a']],
-    poses:{ a:mk(C,{el:[190,95],ha:[176,88]}), b:{head:[234,-14],sh:[234,12],mid:[236,45],hip:[238,75],kN:[243,140],fN:[245,205],kF:[239,140],fF:[241,205],el:[250,32],ha:[236,26]} } },
   { id:'atras', name:'Extensión hacia atrás', pos:'De pie', dose:'10 veces',
     how:['De pie, con los pies separados y las manos en la parte baja de la espalda.','Inclina el tronco hacia atrás despacio, solo un poco, mirando al frente.','Vuelve a ponerte recto.'],
     tip:'A algunas personas este movimiento las alivia y a otras les molesta. Si el dolor aumenta o baja por la pierna, sáltalo.',
@@ -267,7 +285,7 @@ const EX = [
   { id:'marcha', name:'Marcha en el sitio', pos:'De pie', dose:'3 minutos',
     how:['De pie, cerca de una pared o un mueble por si necesitas apoyarte.','Marcha sin moverte del sitio, a un ritmo cómodo, levantando un poco las rodillas.','Si lo prefieres, puedes salir a caminar.'],
     tip:'Mantenerte activo es de lo que más ayuda con la ciática.',
-    loop:180, period:0.8,
+    loop:180, period:0.8, loopSay:'A marchar', cues:{120:'Quedan dos minutos.',60:'Queda un minuto.',10:'Quedan diez segundos.'},
     poses:{ a:mk(T,{kF:[232,110],fF:[226,176],el:[190,45],ha:[184,76]}), b:mk(T,{kN:[238,110],fN:[232,176],el:[214,44],ha:[228,70]}) } },
 ];
 
@@ -285,7 +303,7 @@ let voice = null;
 function pickVoice() {
   if (!window.speechSynthesis) return null;
   const vs = speechSynthesis.getVoices().filter(v => /^es([-_]|$)/i.test(v.lang));
-  const score = v => (/google/i.test(v.name) ? 10 : 0) + (/(419|US|MX|CO|VE|AR|CL|PE)/i.test(v.lang) ? 3 : 0) + (/ES/.test(v.lang) ? 2 : 0) + (v.localService ? 1 : 0);
+  const score = v => (/google/i.test(v.name) ? 4 : 0) + (/VE/i.test(v.lang) ? 12 : 0) + (/(419|US|MX|CO)/i.test(v.lang) ? 8 : 0) + (/(AR|CL|PE)/i.test(v.lang) ? 5 : 0) + (v.localService ? 1 : 0);
   vs.sort((a, b) => score(b) - score(a));
   voice = vs[0] || null;
   $('noVoice').hidden = !!voice || speechSynthesis.getVoices().length === 0;
@@ -301,7 +319,7 @@ function speak(text) {
   if (!voice) pickVoice();
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = voice ? voice.lang : 'es-ES';
+  u.lang = voice ? voice.lang : 'es-US';
   if (voice) u.voice = voice;
   u.rate = 0.9;
   speechSynthesis.speak(u);
@@ -389,7 +407,8 @@ function fitView(ex) {
     const r = k === 'head' ? 16 : 8;
     x0 = Math.min(x0, p[k][0]-r); x1 = Math.max(x1, p[k][0]+r); y0 = Math.min(y0, p[k][1]-r); y1 = Math.max(y1, p[k][1]+r);
   }});
-  if (ex.chair) { x0 = Math.min(x0, 132); y0 = Math.min(y0, 66); }
+  if (ex.chair === 'front') { x0 = Math.min(x0, 152); x1 = Math.max(x1, 248); }
+  else if (ex.chair) { x0 = Math.min(x0, 132); y0 = Math.min(y0, 66); }
   const pad = 22, w = x1 - x0 + pad*2, h = y1 - y0 + pad*2;
   const s = Math.min(400 / w, 300 / h);
   view = { s, ox: (400 - (x1 - x0) * s) / 2 - x0 * s, oy: (300 - (y1 - y0) * s) / 2 - y0 * s };
@@ -438,11 +457,14 @@ function draw() {
   // suelo
   ctx.strokeStyle = css('--floor'); ctx.lineWidth = 5;
   ctx.beginPath(); ctx.moveTo(-400, 211); ctx.lineTo(800, 211); ctx.stroke();
-  if (exNow.chair) {
+  if (exNow.chair === 'front') {
+    ctx.strokeStyle = css('--floor'); ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.moveTo(160,150); ctx.lineTo(240,150); ctx.moveTo(166,150); ctx.lineTo(166,209); ctx.moveTo(234,150); ctx.lineTo(234,209); ctx.stroke();
+  } else if (exNow.chair) {
     ctx.strokeStyle = css('--floor'); ctx.lineWidth = 8;
     ctx.beginPath(); ctx.moveTo(140,72); ctx.lineTo(140,150); ctx.lineTo(212,150); ctx.moveTo(146,150); ctx.lineTo(146,209); ctx.moveTo(206,150); ctx.lineTo(206,209); ctx.stroke();
   }
-  const feet = exNow.pos !== 'Acostado boca arriba';
+  const feet = exNow.pos !== 'Acostado boca arriba' && !exNow.front;
   const opts = { fig: css('--figure'), far: css('--figure-far'), move: css('--move'), moveFar: css('--move'), feet };
   // sombra de la posición a la que hay que llegar
   drawBody(exNow.poses.b, { ghost: css('--ghost'), feet });
@@ -483,8 +505,9 @@ function startDemo(ex) {
 function stopDemo() { clearTimeout(demoTimer); demoTimer = null; }
 
 // ---------- Ejercicio ----------
+const POS_FIRST = 'Siéntate en una silla firme, sin ruedas y pegada a la pared.';
 const POS_MSG = {
-  'Acostado boca arriba': 'Acuéstate boca arriba en una cama firme o en una colchoneta.',
+  'Acostado boca arriba': 'Ahora acuéstate boca arriba en una cama firme o en una colchoneta.',
   'Sentado en una silla': 'Ahora levántate con calma y siéntate en una silla firme.',
   'De pie': 'Ahora levántate con calma y ponte de pie cerca de algo donde apoyarte.'
 };
@@ -502,13 +525,14 @@ function openEx(i) {
   $('exHow').innerHTML = ex.how.map(h => '<li>' + h + '</li>').join('');
   $('exTip').textContent = ex.tip;
   const moved = !prev || prev.pos !== ex.pos;
-  $('moveNote').hidden = !moved; $('moveNote').textContent = POS_MSG[ex.pos];
+  const posText = i === 0 ? POS_FIRST : POS_MSG[ex.pos];
+  $('moveNote').hidden = !moved; $('moveNote').textContent = posText;
   $('idle').hidden = false; $('running').hidden = true;
   $('idleBtns').hidden = false; $('runBtns').hidden = true;
   setTarget(ex.poses.a, 0.3);
   startDemo(ex);
   show('ex');
-  speak((moved ? POS_MSG[ex.pos] + ' ' : '') + (i === 0 ? 'Primer ejercicio: ' : 'Siguiente ejercicio: ') + ex.name + '. Cuando estés listo, toca Empezar.');
+  speak((moved ? posText + ' ' : '') + (i === 0 ? 'Primer ejercicio: ' : 'Siguiente ejercicio: ') + ex.name + '. Cuando estés listo, toca Empezar.');
 }
 $('listenBtn').onclick = () => { const ex = EX[session.i]; speak(ex.name + '. ' + ex.how.join(' ') + ' ' + ex.tip); };
 $('skipBtn').onclick = () => openEx(session.i + 1);
@@ -517,18 +541,19 @@ $('quitBtn').onclick = () => { stopRun(); stopDemo(); if (window.speechSynthesis
 // Secuencia de pasos de un ejercicio
 function buildSteps(ex) {
   const st = [];
-  if (ex.loop) { st.push({ say:'A marchar', t:ex.loop, pose:'b', loop:true, info:'' }); return st; }
-  const sides = ex.sides ? ['derecha','izquierda'] : [null];
+  if (ex.loop) { st.push({ say:ex.loopSay, t:ex.loop, pose:'b', loop:true, info:'' }); return st; }
+  const sides = ex.sides ? (ex.sideNames || ['derecha','izquierda']) : [null];
+  const word = ex.sideWord || 'Pierna';
   sides.forEach((side, si) => {
     for (let s = 0; s < ex.sets; s++) {
-      if (si > 0 && s === 0) st.push({ say:'Descansa. Ahora vamos con la pierna izquierda.', label:'Descansa', t:ex.rest || 8, pose:'a', info:'Después: pierna izquierda' });
+      if (si > 0 && s === 0) st.push({ say:'Descansa. Ahora vamos con ' + (word === 'Lado' ? 'el lado ' : 'la pierna ') + side + '.', label:'Descansa', t:ex.rest || 8, pose:'a', info:'Después: ' + word.toLowerCase() + ' ' + side });
       else if (s > 0) st.push({ say:'Descansa un momento.', label:'Descansa', t:ex.rest || 10, pose:'a', info:'Después: serie ' + (s+1) + ' de ' + ex.sets });
       for (let r = 0; r < ex.reps; r++) {
         ex.phases.forEach(([say, t, pose], pi) => {
           let info = 'Repetición ' + (r+1) + ' de ' + ex.reps;
           if (ex.sets > 1) info += ' · Serie ' + (s+1) + ' de ' + ex.sets;
-          if (side) info += ' · Pierna ' + side;
-          st.push({ say, t, pose, info, first: r === 0 && pi === 0 && s === 0, side });
+          if (side) info += ' · ' + word + ' ' + side;
+          st.push({ say, t, pose, info, first: r === 0 && pi === 0 && s === 0, side, word });
         });
       }
     }
@@ -556,7 +581,7 @@ function nextStep() {
   setTarget(ex.poses[st.pose], Math.min(1.4, st.t * 0.7));
   $('runSay').textContent = st.label || st.say;
   $('runInfo').textContent = st.info;
-  speak(st.first && st.side ? 'Pierna ' + st.side + '. ' + st.say : st.say);
+  speak(st.first && st.side ? st.word + ' ' + st.side + '. ' + st.say : st.say);
 }
 function tick() {
   if (!run) return;
@@ -569,7 +594,7 @@ function tick() {
     if (run.flip >= ex.period) { run.flip = 0; setTarget(to === ex.poses.a ? ex.poses.b : ex.poses.a, ex.period * 0.9); }
     const left = Math.max(0, Math.ceil(run.left)), m = Math.floor(left / 60), s = left % 60;
     $('runNum').textContent = m + ':' + String(s).padStart(2,'0');
-    if (left !== run.lastSec) { run.lastSec = left; if (left === 120) speak('Quedan dos minutos.'); if (left === 60) speak('Queda un minuto.'); if (left === 10) speak('Quedan diez segundos.'); }
+    if (left !== run.lastSec) { run.lastSec = left; if (ex.cues && ex.cues[left]) speak(ex.cues[left]); }
   } else {
     const sec = Math.max(0, Math.ceil(run.left));
     $('runNum').textContent = sec;
@@ -613,7 +638,7 @@ function finish() {
   $('painCompare').textContent = txt;
   $('hurtCard').hidden = !(session && session.hurt.length);
   $('hurtList').innerHTML = session ? session.hurt.map(h => '<li>' + h + '</li>').join('') : '';
-  speak('¡Muy bien! Terminaste los ejercicios de hoy.');
+  speak('¡Muy bien! ¡Chévere! Terminaste los ejercicios de hoy.');
   show('done');
 }
 
