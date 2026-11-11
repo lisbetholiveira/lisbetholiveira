@@ -112,7 +112,6 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
     <h1>Ejercicios para la ciática</h1>
   </div>
   <p>Unos <b>25 minutos</b>. Un ejercicio a la vez: la app te explica cada uno en voz alta y te lleva el tiempo.</p>
-  <p class="notice soft" id="noVoice" hidden>Este teléfono no tiene voz en español. Para activarla: Ajustes › Sistema › Idioma › Texto a voz › Motor de Google › Instalar datos de voz › Español.</p>
   <button class="btn primary" id="startBtn">Empezar</button>
   <div class="card">
     <h2 id="monthTitle">Este mes</h2>
@@ -301,33 +300,40 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } c
 const dayKey = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 const today = () => dayKey(new Date());
 
-// ---------- Voz en español ----------
-// Solo usa una voz española; nunca deja que el teléfono lea el texto con otra voz.
-let voice = null;
-function pickVoice() {
-  if (!window.speechSynthesis) return null;
-  const vs = speechSynthesis.getVoices().filter(v => /^es([-_]|$)/i.test(v.lang));
-  const score = v => (/google/i.test(v.name) ? 4 : 0) + (/VE/i.test(v.lang) ? 12 : 0) + (/(419|US|MX|CO)/i.test(v.lang) ? 8 : 0) + (/(AR|CL|PE)/i.test(v.lang) ? 5 : 0) + (v.localService ? 1 : 0);
-  vs.sort((a, b) => score(b) - score(a));
-  voice = vs[0] || null;
-  $('noVoice').hidden = !!voice || speechSynthesis.getVoices().length === 0;
-  return voice;
-}
+// ---------- Voz: audios grabados (ElevenLabs) ----------
+// Cada frase tiene su archivo audio/<hash>.mp3. Si falta, suena un bip (nunca otra voz).
 const $ = id => document.getElementById(id);
-if (window.speechSynthesis) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function hashText(t) {
+  let h = 0x811c9dc5;
+  for (const b of new TextEncoder().encode(t)) { h ^= b; h = Math.imul(h, 0x01000193) >>> 0; }
+  return h.toString(16).padStart(8, '0');
+}
+let actx = null;
+function beep(freq, ms) {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.frequency.value = freq || 880; o.connect(g); g.connect(actx.destination);
+    g.gain.setValueAtTime(0.25, actx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + (ms || 180) / 1000);
+    o.start(); o.stop(actx.currentTime + (ms || 180) / 1000);
+  } catch (e) {}
+}
 const voiceOn = $('voiceOn');
 try { if (localStorage.getItem(KEY + '-voz') === '0') voiceOn.checked = false; } catch (e) {}
 voiceOn.addEventListener('change', () => { try { localStorage.setItem(KEY + '-voz', voiceOn.checked ? '1' : '0'); } catch (e) {} });
+let current = null;
+const clips = {};
+function clip(text) { const h = hashText(text); return clips[h] || (clips[h] = new Audio('audio/' + h + '.mp3')); }
 function speak(text) {
-  if (!voiceOn.checked || !window.speechSynthesis || !text) return;
-  if (!voice) pickVoice();
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = voice ? voice.lang : 'es-US';
-  if (voice) u.voice = voice;
-  u.rate = 0.9;
-  speechSynthesis.speak(u);
+  if (!text) return;
+  if (current) { try { current.pause(); current.currentTime = 0; } catch (e) {} }
+  if (!voiceOn.checked) { beep(); return; }
+  const a = clip(text); current = a;
+  try { a.currentTime = 0; } catch (e) {}
+  const p = a.play(); if (p && p.catch) p.catch(() => beep());
 }
+function stopVoice() { if (current) { try { current.pause(); } catch (e) {} } }
+function preload(list) { list.forEach(t => { const a = clip(t); a.preload = 'auto'; }); }
 $('testVoice').onclick = () => speak('Hola. Esta es la voz que te va a guiar en los ejercicios.');
 
 // ---------- Pantallas ----------
@@ -544,11 +550,12 @@ function openEx(i) {
   setTarget(ex.poses.a, 0.3);
   startDemo(ex);
   show('ex');
-  speak((moved ? posText + ' ' : '') + (i === 0 ? 'Primer ejercicio: ' : 'Siguiente ejercicio: ') + ex.name + '. Cuando estés listo, toca Empezar.');
+  speak(introText(i));
+  preload(phrasesFor(i).concat(i + 1 < EX.length ? [introText(i + 1)] : []));
 }
-$('listenBtn').onclick = () => { const ex = EX[session.i]; speak(ex.name + '. ' + ex.how.join(' ') + ' ' + ex.tip); };
+$('listenBtn').onclick = () => speak(listenText(EX[session.i]));
 $('skipBtn').onclick = () => openEx(session.i + 1);
-$('quitBtn').onclick = () => { stopRun(); stopDemo(); if (window.speechSynthesis) speechSynthesis.cancel(); renderHome(); show('home'); };
+$('quitBtn').onclick = () => { stopRun(); stopDemo(); stopVoice(); renderHome(); show('home'); };
 
 // Secuencia de pasos de un ejercicio
 function buildSteps(ex) {
@@ -573,6 +580,26 @@ function buildSteps(ex) {
   return st;
 }
 
+// Todas las frases que la app puede decir (para generar y precargar los audios)
+function introText(i) {
+  const ex = EX[i], prev = EX[i-1], moved = !prev || prev.pos !== ex.pos;
+  const posText = i === 0 ? POS_FIRST : POS_MSG[ex.pos];
+  return (moved ? posText + ' ' : '') + (i === 0 ? 'Primer ejercicio: ' : 'Siguiente ejercicio: ') + ex.name + '. Cuando estés listo, toca Empezar.';
+}
+const listenText = ex => ex.name + '. ' + ex.how.join(' ') + ' ' + ex.tip;
+const stepText = st => st.first && st.side ? st.word + ' ' + st.side + '. ' + st.say : st.say;
+function phrasesFor(i) {
+  const ex = EX[i], out = new Set([introText(i), listenText(ex)]);
+  buildSteps(ex).forEach(st => out.add(stepText(st)));
+  if (ex.cues) Object.values(ex.cues).forEach(c => out.add(c));
+  return [...out];
+}
+window.allPhrases = () => {
+  const out = new Set(['Hola. Esta es la voz que te va a guiar en los ejercicios.', 'uno', 'dos', 'tres', 'Pausa.', 'Seguimos.', 'Está bien. Nos saltamos este.', '¡Muy bien!', '¡Muy bien! ¡Chévere! Terminaste los ejercicios de hoy.']);
+  EX.forEach((ex, i) => phrasesFor(i).forEach(t => out.add(t)));
+  return [...out];
+};
+
 let run = null;
 function stopRun() { if (run) { clearInterval(run.timer); run = null; } releaseWake(); }
 $('goBtn').onclick = () => {
@@ -593,7 +620,7 @@ function nextStep() {
   setTarget(ex.poses[st.pose], Math.min(1.4, st.t * 0.7));
   $('runSay').textContent = st.label || st.say;
   $('runInfo').textContent = st.info;
-  speak(st.first && st.side ? st.word + ' ' + st.side + '. ' + st.say : st.say);
+  speak(stepText(st));
 }
 function tick() {
   if (!run) return;
