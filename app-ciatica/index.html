@@ -245,7 +245,7 @@ const EX = [
   { id:'nervio2', name:'Deslizamiento del nervio (sentado)', pos:'Sentado en una silla', chair:true, dose:'10 veces con cada pierna',
     how:["Siéntate en el borde de la silla, con la espalda derecha.", "Estira la rodilla derecha hasta que la pierna quede recta y, a la vez, levanta la mirada.", "Dobla otra vez la rodilla y baja la mirada.", "Hazlo seguido y suave, sin parar arriba. Luego, la otra pierna."],
     tip:'Usa una silla sin ruedas, pegada a la pared.',
-    sides:true, sets:1, reps:10, rest:10, phases:[['Estira y mira arriba',2,'b'],['Dobla y mira abajo',2,'a']],
+    sides:true, sets:1, reps:10, rest:10, phases:[['Estira y mira arriba',3,'b'],['Dobla y mira abajo',3,'a']],
     poses:{ a:mk(C,{head:[188,58]}), b:mk(C,{head:[160,42],fN:[306,126]}) } },
   { id:'silla', name:'Levantarse de la silla', pos:'Sentado en una silla', chair:true, dose:'2 series de 6',
     how:["Siéntate en el borde de la silla, con los pies un poco hacia atrás.", "Cruza los brazos sobre el pecho.", "Inclínate hacia delante y ponte de pie empujando con las piernas.", "Siéntate muy despacio. Si hace falta, ayúdate con las manos."],
@@ -260,7 +260,7 @@ const EX = [
   { id:'pelvis', name:'Basculación de la pelvis', pos:'Acostado boca arriba', dose:'2 series de 8',
     how:["Boca arriba, con las rodillas dobladas.", "Mete la barriga y aprieta la parte baja de la espalda contra el suelo.", "Aguanta tres segundos.", "Relaja y deja que la espalda vuelva a su curva normal."],
     tip:'Respira con normalidad. No aguantes el aire.',
-    sets:2, reps:8, rest:15, phases:[['Aplana la espalda',2,'b'],['Aguanta',3,'b'],['Relaja',3,'a']],
+    sets:2, reps:8, rest:15, phases:[['Aplana la espalda',3,'b'],['Aguanta',3,'b'],['Relaja',3,'a']],
     poses:{ a:mk(S,{mid:[150,186]}), b:mk(S,{mid:[150,201],hip:[204,190],kN:[244,136],kF:[240,139]}) } },
   { id:'rodilla', name:'Rodilla al pecho', pos:'Acostado boca arriba', dose:'3 veces 20 segundos, con cada pierna',
     how:["Boca arriba, con las dos rodillas dobladas.", "Abraza la rodilla derecha con las dos manos y llévala hacia el pecho.", "Aguanta 20 segundos, respirando tranquilo.", "Bájala despacio y repite con la otra pierna."],
@@ -280,12 +280,12 @@ const EX = [
   { id:'puente', name:'Puente', pos:'Acostado boca arriba', dose:'2 series de 8',
     how:["Boca arriba, con las rodillas dobladas, los pies apoyados y los brazos a los lados.", "Aprieta los glúteos y sube la cadera del suelo.", "Aguanta tres segundos arriba.", "Baja despacio hasta apoyar la espalda."],
     tip:'Fortalece los glúteos y protege la espalda. No hace falta subir mucho.',
-    sets:2, reps:8, rest:15, phases:[['Sube',2,'b'],['Aguanta',3,'b'],['Baja',3,'a']],
+    sets:2, reps:8, rest:15, phases:[['Sube',3,'b'],['Aguanta',3,'b'],['Baja',3,'a']],
     poses:{ a:S, b:mk(S,{hip:[208,148],mid:[152,172],kN:[264,136],kF:[260,139]}) } },
   { id:'nervio1', name:'Deslizamiento del nervio (acostado)', pos:'Acostado boca arriba', dose:'10 veces con cada pierna',
     how:["Boca arriba, sube la rodilla derecha y sujeta el muslo por detrás con las dos manos.", "Estira la rodilla hacia el techo hasta notar una ligera tensión.", "Dobla otra vez la rodilla.", "Hazlo seguido y suave, sin parar arriba. Luego, la otra pierna."],
     tip:'Es normal un hormigueo leve que se pasa enseguida. Si va a más, para.',
-    sides:true, sets:1, reps:10, rest:10, phases:[['Estira',2,'b'],['Dobla',2,'a']],
+    sides:true, sets:1, reps:10, rest:10, phases:[['Estira',3,'b'],['Dobla',3,'a']],
     poses:{ a:mk(S,{kN:[205,124],fN:[262,156],el:[150,172],ha:[200,150]}), b:mk(S,{kN:[205,124],fN:[214,56],el:[150,172],ha:[200,150]}) } },
   { id:'gluteo', name:'Estiramiento del glúteo', pos:'Acostado boca arriba', dose:'2 veces 20 segundos, con cada pierna',
     how:["Boca arriba, con las rodillas dobladas.", "Pon el tobillo derecho sobre la rodilla izquierda, formando un 4.", "Agarra el muslo izquierdo y acércalo al pecho.", "Aguanta 20 segundos y cambia de pierna."],
@@ -320,32 +320,57 @@ function hashText(t) {
   for (const b of new TextEncoder().encode(t)) { h ^= b; h = Math.imul(h, 0x01000193) >>> 0; }
   return h.toString(16).padStart(8, '0');
 }
+// Motor de sonido con Web Audio: cada audio se descarga, se decodifica una vez y se toca entero.
+// Así no hay cortes ni saltos en Android, y sabemos cuánto dura cada frase.
 let actx = null;
+function ac() {
+  actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+  if (actx.state === 'suspended') actx.resume().catch(() => {});
+  return actx;
+}
+document.addEventListener('pointerdown', () => { try { ac(); } catch (e) {} }, { passive: true });
 function beep(freq, ms) {
   try {
-    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-    const o = actx.createOscillator(), g = actx.createGain();
-    o.frequency.value = freq || 880; o.connect(g); g.connect(actx.destination);
-    g.gain.setValueAtTime(0.25, actx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + (ms || 180) / 1000);
-    o.start(); o.stop(actx.currentTime + (ms || 180) / 1000);
+    const c = ac(), o = c.createOscillator(), g = c.createGain();
+    o.frequency.value = freq || 880; o.connect(g); g.connect(c.destination);
+    g.gain.setValueAtTime(0.25, c.currentTime); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + (ms || 180) / 1000);
+    o.start(); o.stop(c.currentTime + (ms || 180) / 1000);
   } catch (e) {}
 }
 const voiceOn = $('voiceOn');
 try { if (localStorage.getItem(KEY + '-voz') === '0') voiceOn.checked = false; } catch (e) {}
 voiceOn.addEventListener('change', () => { try { localStorage.setItem(KEY + '-voz', voiceOn.checked ? '1' : '0'); } catch (e) {} });
-let current = null;
-const clips = {};
-function clip(text) { const h = hashText(text); return clips[h] || (clips[h] = new Audio('audio/' + h + '.mp3')); }
-function speak(text) {
-  if (!text) return;
-  if (current) { try { current.pause(); current.currentTime = 0; } catch (e) {} }
-  if (!voiceOn.checked) { beep(); return; }
-  const a = clip(text); current = a;
-  try { a.currentTime = 0; } catch (e) {}
-  const p = a.play(); if (p && p.catch) p.catch(() => beep());
+const bufs = {}, loading = {};
+function loadBuf(text) {
+  const h = hashText(text);
+  if (bufs[h]) return Promise.resolve(bufs[h]);
+  if (!loading[h]) {
+    loading[h] = fetch('audio/' + h + '.mp3')
+      .then(r => { if (!r.ok) throw new Error('audio'); return r.arrayBuffer(); })
+      .then(ab => new Promise((res, rej) => ac().decodeAudioData(ab, res, rej)))
+      .then(b => (bufs[h] = b))
+      .catch(() => { delete loading[h]; return null; });
+  }
+  return loading[h];
 }
-function stopVoice() { if (current) { try { current.pause(); } catch (e) {} } }
-function preload(list) { list.forEach(t => { const a = clip(t); a.preload = 'auto'; }); }
+let src = null, speakId = 0;
+function stopVoice() { speakId++; if (src) { try { src.stop(); } catch (e) {} src = null; } }
+// Devuelve una promesa que se cumple cuando la frase termina
+function speak(text) {
+  if (!text) return Promise.resolve();
+  stopVoice();
+  const id = speakId;
+  if (!voiceOn.checked) { beep(); return Promise.resolve(); }
+  return loadBuf(text).then(b => {
+    if (id !== speakId) return;
+    if (!b) { beep(); return; }
+    const s2 = ac().createBufferSource(); s2.buffer = b; s2.connect(actx.destination);
+    src = s2;
+    return new Promise(res => { s2.onended = () => { if (src === s2) src = null; res(); }; s2.start(); });
+  });
+}
+function clipDuration(text) { const b = bufs[hashText(text)]; return b ? b.duration : text.length / 11; }
+function preload(list) { list.forEach(t => loadBuf(t)); }
 $('testVoice').onclick = () => speak('Hola. Esta es la voz que te va a guiar en los ejercicios.');
 
 // ---------- Pantallas ----------
@@ -666,7 +691,8 @@ $('quitBtn').onclick = () => { stopRun(); stopDemo(); stopVoice(); renderHome();
 // Secuencia de pasos de un ejercicio
 function buildSteps(ex) {
   const st = [];
-  if (ex.loop) { st.push({ say:ex.loopSay, t:ex.loop, pose:'b', loop:true, info:'' }); return st; }
+  if (ex.loop) { st.push({ say:'Prepárate.', label:'Prepárate', t:4, pose:'a', info:'Ponte en la posición inicial' }); st.push({ say:ex.loopSay, t:ex.loop, pose:'b', loop:true, info:'' }); return st; }
+  st.push({ say:'Prepárate.', label:'Prepárate', t:4, pose:'a', info:'Ponte en la posición inicial' });
   const sides = ex.sides ? (ex.sideNames || ['derecha','izquierda']) : [null];
   const word = ex.sideWord || 'Pierna';
   sides.forEach((side, si) => {
@@ -701,7 +727,7 @@ function phrasesFor(i) {
   return [...out];
 }
 window.allPhrases = () => {
-  const out = new Set(['Hola. Esta es la voz que te va a guiar en los ejercicios.', 'uno', 'dos', 'tres', 'Pausa.', 'Seguimos.', 'Está bien. Nos saltamos este.', '¡Muy bien!', '¡Muy bien! ¡Chévere! Terminaste los ejercicios de hoy.']);
+  const out = new Set(['Hola. Esta es la voz que te va a guiar en los ejercicios.', 'Pausa.', 'Seguimos.', 'Está bien. Nos saltamos este.', '¡Muy bien!', '¡Muy bien! ¡Chévere! Terminaste los ejercicios de hoy.']);
   EX.forEach((ex, i) => phrasesFor(i).forEach(t => out.add(t)));
   return [...out];
 };
@@ -709,7 +735,8 @@ window.allPhrases = () => {
 let run = null;
 function stopRun() { if (run) { clearInterval(run.timer); run = null; } releaseWake(); }
 $('goBtn').onclick = () => {
-  stopDemo();
+  if (run) return;
+  stopDemo(); ac();
   run = { steps: buildSteps(EX[session.i]), k: -1, left: 0, paused: false, last: performance.now(), lastSec: null, flip: 0 };
   $('idle').hidden = true; $('running').hidden = false;
   $('idleBtns').hidden = true; $('runBtns').hidden = false;
@@ -722,7 +749,7 @@ function nextStep() {
   run.k++;
   if (run.k >= run.steps.length) { exerciseDone(); return; }
   const st = run.steps[run.k], ex = EX[session.i];
-  run.left = st.t; run.lastSec = null; run.flip = 0;
+  run.left = st.loop ? st.t : Math.max(st.t, clipDuration(stepText(st)) + 0.5); run.lastSec = null; run.flip = 0;
   setTarget(ex.poses[st.pose], Math.min(1.4, st.t * 0.7));
   $('runSay').textContent = st.label || st.say;
   $('runInfo').textContent = st.info;
@@ -743,7 +770,7 @@ function tick() {
   } else {
     const sec = Math.max(0, Math.ceil(run.left));
     $('runNum').textContent = sec;
-    if (st.t >= 10 && sec !== run.lastSec && sec >= 1 && sec <= 3) speak(['','uno','dos','tres'][sec]);
+    if (st.t >= 10 && sec !== run.lastSec && sec >= 1 && sec <= 3) beep(660, 120);
     run.lastSec = sec;
   }
   if (run.left <= 0) nextStep();
@@ -757,14 +784,14 @@ $('pauseBtn').onclick = () => {
 $('hurtBtn').onclick = () => {
   const ex = EX[session.i];
   if (!session.hurt.includes(ex.name)) session.hurt.push(ex.name);
-  stopRun(); speak('Está bien. Nos saltamos este.');
-  setTimeout(() => openEx(session.i + 1), 1500);
+  stopRun(); const at = session.i;
+  speak('Está bien. Nos saltamos este.').then(() => setTimeout(() => { if (session.i === at) openEx(at + 1); }, 500));
 };
 function exerciseDone() {
   stopRun();
-  speak('¡Muy bien!');
-  $('exBar').style.width = ((session.i + 1) / EX.length * 100) + '%';
-  setTimeout(() => openEx(session.i + 1), 1600);
+  const at = session.i;
+  $('exBar').style.width = ((at + 1) / EX.length * 100) + '%';
+  speak('¡Muy bien!').then(() => setTimeout(() => { if (session.i === at) openEx(at + 1); }, 700));
 }
 
 // Mantener la pantalla encendida durante el ejercicio (si el teléfono lo permite)

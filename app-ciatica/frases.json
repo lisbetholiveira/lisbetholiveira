@@ -4,18 +4,6 @@
   "text": "Hola. Esta es la voz que te va a guiar en los ejercicios."
  },
  {
-  "id": "51d4a16f",
-  "text": "uno"
- },
- {
-  "id": "da68aa25",
-  "text": "dos"
- },
- {
-  "id": "578b1233",
-  "text": "tres"
- },
- {
   "id": "181deddd",
   "text": "Pausa."
  },
@@ -42,6 +30,10 @@
  {
   "id": "bc8939a6",
   "text": "Giro de tronco sentado. Siéntate derecho en la silla, con los pies apoyados en el suelo. Gira el pecho y la cabeza despacio hacia la derecha y agarra el respaldo con la mano. Quédate ahí 15 segundos, respirando tranquilo. Vuelve al frente despacio y repite hacia la izquierda."
+ },
+ {
+  "id": "94d60cae",
+  "text": "Prepárate."
  },
  {
   "id": "daf2372a",
