@@ -20,10 +20,10 @@
   --move: #1c56c4;
   --ghost: rgba(28, 86, 196, 0.22);
   --floor: #b9c8d1;
-  --skin: #d9a07a; --skin-far: #b7825f; --shirt: #2f6fd0; --shirt-far: #24549e;
-  --pants: #3d4a57; --pants-far: #2a333c; --shoe: #1d2227; --hair: #3b2a22;
+  --skin: #e2b394; --skin-far: #c4927a; --shirt: #1d2a5c; --shirt-far: #141d42; --stripe-y: #f2c230; --stripe-b: #2f5fd0; --collar: #f4f1ea;
+  --pants: #1f2a4d; --pants-far: #141b33; --shoe: #23201d; --hair: #9a9590;
   --mat: #9fd3c7; --mat-edge: #6fb3a4; --chair: #b07a4f; --chair-dark: #8a5c38;
-  --glow: rgba(255, 196, 0, 0.55);
+  --glow: rgba(64, 190, 120, 0.45);
   --font: "Atkinson Hyperlegible", "Segoe UI", Roboto, Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
@@ -449,62 +449,74 @@ function setTarget(pose, dur) {
   from = cur ? clone(cur) : clone(pose);
   to = pose; tStart = performance.now(); tDur = Math.max(0.25, dur) * 1000;
 }
-// Figura humana: cabeza con pelo y cara, cuerpo con volumen, ropa, manos y zapatos
+// Avatar: la cara de la foto + cuerpo con la ropa de la foto (camisa a rayas, pantalón azul)
+const face = new Image(); let faceOk = false;
+face.onload = () => { faceOk = true; }; face.src = 'avatar.png';
 function norm(x, y) { const l = Math.hypot(x, y) || 1; return [x / l, y / l]; }
+let stripeTile = null;
+function stripePattern(angle, far) {
+  // Rayas: azul marino, amarilla, azul marino, azul; giradas para quedar perpendiculares al miembro
+  const key = far ? 'far' : 'near';
+  stripeTile = stripeTile || {};
+  if (!stripeTile[key]) {
+    const t = document.createElement('canvas'); t.width = 4; t.height = 28;
+    const g = t.getContext('2d');
+    g.fillStyle = css(far ? '--shirt-far' : '--shirt'); g.fillRect(0, 0, 4, 28);
+    g.fillStyle = css('--stripe-y'); g.globalAlpha = far ? .6 : 1; g.fillRect(0, 7, 4, 5);
+    g.fillStyle = css('--stripe-b'); g.fillRect(0, 19, 4, 4);
+    stripeTile[key] = t;
+  }
+  const pat = ctx.createPattern(stripeTile[key], 'repeat');
+  try { pat.setTransform(new DOMMatrix().rotateSelf(angle * 180 / Math.PI - 90)); } catch (e) {}
+  return pat;
+}
 function drawBody(p, opts) {
-  const C = opts.ghost ? null : opts.col;
+  const G = opts.ghost, C = opts.col;
   const line = (a, b, w, col) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b); ctx.stroke(); };
-  const path = (pts, w, col) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(...pts[0]); pts.slice(1).forEach(q => ctx.lineTo(...q)); ctx.stroke(); };
   const dot = (c, r, col) => { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(c[0], c[1], r, 0, Math.PI * 2); ctx.fill(); };
-  const shoeDir = (k, f) => {
-    if (opts.front) return [0, 0];
-    if (p[f][1] > 196) return [1, 0];          // pie apoyado en el suelo: horizontal
-    const [dx, dy] = norm(p[f][0] - p[k][0], p[f][1] - p[k][1]);
-    return [dy, -dx];                           // perpendicular a la pierna
-  };
+  const ang = (a, b) => Math.atan2(b[1] - a[1], b[0] - a[0]);
+  const striped = (a, b, w, far) => line(a, b, w, G || stripePattern(ang(a, b), far));
   const shoe = (k, f, col) => {
-    const [ux, uy] = shoeDir(k, f);
-    if (opts.front) { dot([p[f][0], p[f][1] + 2], 8, col); return; }
-    line(p[f], [p[f][0] + ux * 17, p[f][1] + uy * 17], 11, col);
+    if (opts.front) { dot([p[f][0], p[f][1] + 3], 9, col); return; }
+    let ux = 1, uy = 0;
+    if (p[f][1] <= 196) { const [dx, dy] = norm(p[f][0] - p[k][0], p[f][1] - p[k][1]); ux = dy; uy = -dx; }
+    line([p[f][0] - ux * 3, p[f][1] - uy * 3], [p[f][0] + ux * 18, p[f][1] + uy * 18], 12, col);
   };
-  // Resalte (amarillo) detrás de lo que se mueve
-  if (!opts.ghost) {
-    const segs = [['hip','kF'],['kF','fF'],['sh','mid'],['mid','hip'],['hip','kN'],['kN','fN'],['sh','el'],['el','ha']];
-    segs.forEach(([a, b]) => { if (moving.has(a) || moving.has(b)) line(p[a], p[b], 34, css('--glow')); });
+  // Resalte detrás de lo que se mueve
+  if (!G) {
+    [['hip','kF'],['kF','fF'],['sh','mid'],['mid','hip'],['hip','kN'],['kN','fN'],['sh','el'],['el','ha']]
+      .forEach(([a, b]) => { if (moving.has(a) || moving.has(b)) line(p[a], p[b], 40, css('--glow')); });
   }
-  const G = opts.ghost;
-  // Pierna lejana
-  path([p.hip, p.kF, p.fF], 19, G || C.pantsFar); if (!G) shoe('kF', 'fF', C.shoe); else shoe('kF','fF', G);
-  // Brazo lejano no se dibuja (queda detrás del cuerpo)
-  // Tronco (camisa) y cadera (pantalón)
-  path([p.sh, p.mid, p.hip], 34, G || C.shirt);
-  dot(p.hip, 16, G || C.pants);
-  // Cuello
-  line(p.sh, [p.sh[0] + (p.head[0] - p.sh[0]) * 0.55, p.sh[1] + (p.head[1] - p.sh[1]) * 0.55], 11, G || C.skin);
+  // Pierna lejana (pantalón) y zapato
+  line(p.hip, p.kF, 22, G || C.pantsFar); line(p.kF, p.fF, 19, G || C.pantsFar); shoe('kF', 'fF', G || C.shoe);
+  // Tronco: camisa a rayas, más ancha en el pecho
+  if (G) { line(p.sh, p.mid, 40, G); line(p.mid, p.hip, 36, G); }
+  else {
+    line(p.mid, p.hip, 37, C.pants);                       // cintura del pantalón
+    striped(p.sh, p.mid, 42, false);
+    striped(p.mid, [p.mid[0] + (p.hip[0] - p.mid[0]) * 0.75, p.mid[1] + (p.hip[1] - p.mid[1]) * 0.75], 39, false);
+  }
   // Pierna cercana
-  path([p.hip, p.kN, p.fN], 21, G || C.pants); if (!G) shoe('kN', 'fN', C.shoe); else shoe('kN','fN', G);
-  // Brazo cercano: manga + antebrazo + mano
-  const elbowMid = [p.sh[0] + (p.el[0] - p.sh[0]) * 0.6, p.sh[1] + (p.el[1] - p.sh[1]) * 0.6];
-  line(p.sh, p.el, 14, G || C.skin);
-  line(p.sh, elbowMid, 17, G || C.shirt);
-  line(p.el, p.ha, 12, G || C.skin);
-  dot(p.ha, 7.5, G || C.skin);
-  // Cabeza
-  const [ux, uy] = norm(p.head[0] - p.sh[0], p.head[1] - p.sh[1]);   // hacia arriba de la cabeza
-  const h = p.head;
-  if (G) { dot(h, 17, G); return; }
-  if (opts.front) {
-    dot([h[0], h[1] - 3], 17.5, C.hair);
-    dot([h[0], h[1] + 1], 15.5, C.skin);
-    dot([h[0] - 5.5, h[1]], 2.2, C.hair); dot([h[0] + 5.5, h[1]], 2.2, C.hair);
-    return;
-  }
-  const [fx, fy] = [-uy, ux];                    // hacia donde mira la cara
-  dot([h[0] - fx * 3 + ux * 2, h[1] - fy * 3 + uy * 2], 17.5, C.hair);
-  dot([h[0] + fx * 2, h[1] + fy * 2], 15.5, C.skin);
-  dot([h[0] + fx * 16, h[1] + fy * 16 - uy * 0], 4, C.skin);          // nariz
-  dot([h[0] + fx * 9 + ux * 4, h[1] + fy * 9 + uy * 4], 2.2, C.hair); // ojo
-  dot([h[0] - fx * 1, h[1] - fy * 1], 3.5, C.skinFar);               // oreja
+  line(p.hip, p.kN, 24, G || C.pants); line(p.kN, p.fN, 20, G || C.pants); shoe('kN', 'fN', G || C.shoe);
+  // Brazo: manga larga a rayas y mano
+  striped(p.sh, p.el, 16, false); striped(p.el, p.ha, 14, false);
+  dot(p.ha, 8, G || C.skin);
+  // Cuello y cabeza (foto)
+  const [ux, uy] = norm(p.head[0] - p.sh[0], p.head[1] - p.sh[1]);
+  const neck = [p.sh[0] + ux * 9, p.sh[1] + uy * 9];
+  line(p.sh, neck, 13, G || C.skin);
+  if (!G) dot([p.sh[0] + ux * 4, p.sh[1] + uy * 4], 9, css('--collar'));
+  const R = 26;
+  const hc = [p.head[0] + ux * 3, p.head[1] + uy * 3];
+  if (G) { dot(hc, R, G); return; }
+  ctx.save();
+  ctx.translate(hc[0], hc[1]);
+  ctx.rotate(Math.atan2(uy, ux) + Math.PI / 2);
+  ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.closePath();
+  ctx.fillStyle = C.hair; ctx.fill();
+  if (faceOk) { ctx.save(); ctx.clip(); ctx.drawImage(face, -R, -R, R * 2, R * 2); ctx.restore(); }
+  ctx.lineWidth = 2.5; ctx.strokeStyle = C.shirt; ctx.stroke();
+  ctx.restore();
 }
 function draw() {
   if (to) {
@@ -536,7 +548,7 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(138,70); ctx.lineTo(140,152); ctx.lineTo(214,152); ctx.stroke();
   }
   const front = !!exNow.front;
-  const col = { skin: css('--skin'), skinFar: css('--skin-far'), shirt: css('--shirt'), pants: css('--pants'), pantsFar: css('--pants-far'), shoe: css('--shoe'), hair: css('--hair') };
+  const col = { skin: css('--skin'), shirt: css('--shirt'), pants: css('--pants'), pantsFar: css('--pants-far'), shoe: css('--shoe'), hair: css('--hair') };
   const opts = { col, front };
   // sombra de la posición a la que hay que llegar
   drawBody(exNow.poses.b, { ghost: css('--ghost'), front });
