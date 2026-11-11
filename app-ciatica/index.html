@@ -82,6 +82,13 @@ canvas { width: 100%; max-width: 100%; aspect-ratio: 4 / 3; display: block; }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
 .legend i { width: 22px; height: 8px; border-radius: 4px; display: inline-block; }
 ol.how { margin: 0; padding-left: 26px; display: flex; flex-direction: column; gap: 8px; }
+.steps-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.step { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.step p { font-size: 18px; line-height: 1.35; }
+.step-img { position: relative; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.step-img canvas { display: block; width: 100%; aspect-ratio: 4 / 3; }
+.step-img .num { position: absolute; top: 6px; left: 6px; width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-weight: 700; display: grid; place-items: center; font-size: 18px; }
+@media (max-width: 520px) { .steps-grid { grid-template-columns: 1fr; gap: 16px; } .step p { font-size: 20px; } }
 .tip { border-left: 6px solid var(--accent); padding: 6px 0 6px 12px; font-size: 18px; }
 .run { text-align: center; display: flex; flex-direction: column; gap: 4px; align-items: center; }
 .run .say { font-size: 34px; font-weight: 700; }
@@ -174,7 +181,7 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
 
   <div id="idle" class="card">
     <h2>Paso a paso</h2>
-    <ol class="how" id="exHow"></ol>
+    <div class="steps-grid" id="exHow"></div>
     <p class="muted" id="exDose"></p>
     <p class="tip" id="exTip"></p>
   </div>
@@ -417,7 +424,7 @@ function pickPain(v) {
 $('painGo').onclick = () => openEx(0);
 
 // ---------- Dibujo de la figura ----------
-const cv = $('fig'), ctx = cv.getContext('2d');
+const cv = $('fig'); let ctx = cv.getContext('2d');
 let cur = null, from = null, to = null, tStart = 0, tDur = 1, exNow = null, view = null, moving = new Set(), arrow = null;
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const ease = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
@@ -518,18 +525,23 @@ function drawBody(p, opts) {
   else { ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fillStyle = C.hair; ctx.fill(); }
   ctx.restore();
 }
-function draw() {
-  if (to) {
-    const e = ease(Math.min(1, (performance.now() - tStart) / tDur));
-    cur = {}; for (const k in to) cur[k] = [from[k][0] + (to[k][0]-from[k][0])*e, from[k][1] + (to[k][1]-from[k][1])*e];
+function bestArrow(pa, pb) {
+  let best = null, bestD = 0; const mv = new Set();
+  for (const k in pa) {
+    const d = Math.hypot(pa[k][0]-pb[k][0], pa[k][1]-pb[k][1]);
+    if (d > 7) mv.add(k);
+    if (d > bestD && k !== 'head') { bestD = d; best = k; }
   }
-  const W = cv.width, H = cv.height, k = W / 400;
-  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,W,H);
-  if (!view || !cur) return;
+  return { moving: mv, arrow: best && bestD > 7 ? { a: pa[best], b: pb[best] } : null };
+}
+// Dibuja una escena (suelo, colchoneta o silla, sombra, flecha y figura) en el lienzo indicado
+function drawScene(c2d, W, pose, o) {
+  const savedCtx = ctx, savedMoving = moving;
+  ctx = c2d; moving = o.moving || new Set();
+  const k = W / 400;
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,W,W*0.75);
   ctx.setTransform(k * view.s, 0, 0, k * view.s, k * view.ox, k * view.oy);
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  const s = view.s;
-  // suelo
   ctx.strokeStyle = css('--floor'); ctx.lineWidth = 5;
   ctx.beginPath(); ctx.moveTo(-400, 213); ctx.lineTo(800, 213); ctx.stroke();
   if (exNow.pos === 'Acostado boca arriba') {
@@ -549,12 +561,10 @@ function draw() {
   }
   const front = !!exNow.front;
   const col = { skin: css('--skin'), shirt: css('--shirt'), pants: css('--pants'), pantsFar: css('--pants-far'), shoe: css('--shoe'), hair: css('--hair') };
-  const opts = { col, front };
-  // sombra de la posición a la que hay que llegar
-  drawBody(exNow.poses.b, { ghost: css('--ghost'), front });
-  // flecha del movimiento
-  if (arrow) {
-    const [ax, ay] = arrow.a, [bx, by] = arrow.b;
+  if (o.ghost) drawBody(exNow.poses.b, { ghost: css('--ghost'), front });
+  const ar = o.arrow;
+  if (ar) {
+    const [ax, ay] = ar.a, [bx, by] = ar.b;
     const mx = (ax + bx) / 2, my = (ay + by) / 2, dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy);
     const nx = -dy / len, ny = dx / len, off = Math.min(28, len * 0.35);
     const cx = mx + nx * off, cy = my + ny * off;
@@ -569,7 +579,37 @@ function draw() {
     ctx.lineTo(ex1 + Math.cos(a2 - 2.5)*h, ey1 + Math.sin(a2 - 2.5)*h);
     ctx.closePath(); ctx.fill();
   }
-  drawBody(cur, opts);
+  drawBody(pose, { col, front });
+  ctx = savedCtx; moving = savedMoving;
+}
+function draw() {
+  if (to) {
+    const e = ease(Math.min(1, (performance.now() - tStart) / tDur));
+    cur = {}; for (const k in to) cur[k] = [from[k][0] + (to[k][0]-from[k][0])*e, from[k][1] + (to[k][1]-from[k][1])*e];
+  }
+  if (!view || !cur) { ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,cv.width,cv.height); return; }
+  drawScene(ctx, cv.width, cur, { ghost: true, arrow, moving });
+}
+
+// Imágenes fijas del "Paso a paso": una por paso (a = inicio, m = a medio camino, b = posición final)
+const FRAMES = { torsion:'amba', lateral:'aaba', nervio2:'abab', silla:'aaba', resp:'aaba', pelvis:'abba', rodilla:'abba',
+  circulos:'aaba', giro:'abab', puente:'abba', nervio1:'abab', gluteo:'aabb', atras:'abab', marcha:'abab' };
+function poseOf(ex, f) {
+  if (f !== 'm') return ex.poses[f];
+  const o = {}; for (const k in ex.poses.a) o[k] = [(ex.poses.a[k][0] + ex.poses.b[k][0]) / 2, (ex.poses.a[k][1] + ex.poses.b[k][1]) / 2]; return o;
+}
+function renderSteps(ex) {
+  const fr = (FRAMES[ex.id] || 'abab').split('');
+  $('exHow').innerHTML = ex.how.map((h, i) =>
+    '<div class="step"><div class="step-img"><canvas width="520" height="390" data-i="' + i + '" aria-hidden="true"></canvas><span class="num">' + (i + 1) + '</span></div><p>' + h + '</p></div>').join('');
+  const paint = () => $('exHow').querySelectorAll('canvas').forEach(c => {
+    const i = +c.dataset.i, f = fr[i] || 'a', prev = i > 0 ? fr[i - 1] : null;
+    const pose = poseOf(ex, f);
+    const ba = prev && prev !== f ? bestArrow(poseOf(ex, prev), pose) : { moving: new Set(), arrow: null };
+    drawScene(c.getContext('2d'), c.width, pose, { ghost: false, arrow: ba.arrow, moving: ba.moving });
+  });
+  paint();
+  if (!faceOk) face.addEventListener('load', paint, { once: true });
 }
 (function loop() { draw(); requestAnimationFrame(loop); })();
 
@@ -606,7 +646,7 @@ function openEx(i) {
   $('exName').textContent = ex.name;
   $('exPos').textContent = ex.pos;
   $('exDose').textContent = ex.dose;
-  $('exHow').innerHTML = ex.how.map(h => '<li>' + h + '</li>').join('');
+  renderSteps(ex);
   $('exTip').textContent = ex.tip;
   const moved = !prev || prev.pos !== ex.pos;
   const posText = i === 0 ? POS_FIRST : POS_MSG[ex.pos];
