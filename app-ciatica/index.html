@@ -89,7 +89,11 @@ ol.how { margin: 0; padding-left: 26px; display: flex; flex-direction: column; g
 .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; font-size: 15px; }
 .days div { padding: 8px 0; border-radius: 10px; border: 2px solid var(--line); font-variant-numeric: tabular-nums; }
 .days .done { background: var(--good); border-color: var(--good); color: var(--surface); font-weight: 700; }
-.days .today { border-color: var(--accent); }
+.days .today { border-color: var(--accent); border-width: 3px; }
+.days .head { border: 0; padding: 2px 0; font-weight: 700; color: var(--muted); }
+.days .blank { border: 0; }
+.days .future { opacity: .45; }
+.month-count { font-weight: 700; }
 .list { margin: 0; padding-left: 26px; display: flex; flex-direction: column; gap: 4px; }
 .notice { background: var(--surface); border: 3px solid var(--accent); border-radius: 18px; padding: 14px 16px; font-weight: 700; }
 .notice.soft { border-color: var(--warn); font-weight: 400; font-size: 18px; }
@@ -111,7 +115,7 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
   <p class="notice soft" id="noVoice" hidden>Este teléfono no tiene voz en español. Para activarla: Ajustes › Sistema › Idioma › Texto a voz › Motor de Google › Instalar datos de voz › Español.</p>
   <button class="btn primary" id="startBtn">Empezar</button>
   <div class="card">
-    <h2>Últimos 14 días</h2>
+    <h2 id="monthTitle">Este mes</h2>
     <div class="days" id="days"></div>
     <p class="muted" id="streak"></p>
   </div>
@@ -333,16 +337,24 @@ function show(id) { screens.forEach(s => $(s).hidden = s !== id); window.scrollT
 // ---------- Inicio ----------
 function renderHome() {
   const box = $('days'); box.innerHTML = '';
-  const names = ['Do','Lu','Ma','Mi','Ju','Vi','Sá'];
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const r = store.days[dayKey(d)];
+  // Mes completo, semana de lunes a domingo
+  const now = new Date(), y = now.getFullYear(), mo = now.getMonth();
+  const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const daysIn = new Date(y, mo + 1, 0).getDate();
+  const offset = (new Date(y, mo, 1).getDay() + 6) % 7;
+  ['L','M','X','J','V','S','D'].forEach(h => { const el = document.createElement('div'); el.className = 'head'; el.textContent = h; box.appendChild(el); });
+  for (let i = 0; i < offset; i++) { const el = document.createElement('div'); el.className = 'blank'; box.appendChild(el); }
+  let doneMonth = 0;
+  for (let dn = 1; dn <= daysIn; dn++) {
+    const d = new Date(y, mo, dn), r = store.days[dayKey(d)];
     const el = document.createElement('div');
-    el.textContent = names[d.getDay()] + ' ' + d.getDate();
-    if (r && r.done) el.className = 'done';
-    if (i === 0) el.classList.add('today');
+    el.textContent = dn;
+    if (r && r.done) { el.classList.add('done'); doneMonth++; }
+    if (dn === now.getDate()) el.classList.add('today');
+    else if (dn > now.getDate()) el.classList.add('future');
     box.appendChild(el);
   }
+  $('monthTitle').innerHTML = MESES[mo] + ' · <span class="month-count">' + doneMonth + (doneMonth === 1 ? ' día hecho' : ' días hechos') + '</span>';
   let streak = 0;
   for (let i = 0; i < 365; i++) {
     const d = new Date(); d.setDate(d.getDate() - i);
