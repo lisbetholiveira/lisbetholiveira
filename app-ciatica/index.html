@@ -512,10 +512,10 @@ function drawBody(p, opts) {
   ctx.save();
   ctx.translate(hc[0], hc[1]);
   ctx.rotate(Math.atan2(uy, ux) + Math.PI / 2);
-  ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.closePath();
-  ctx.fillStyle = C.hair; ctx.fill();
-  if (faceOk) { ctx.save(); ctx.clip(); ctx.drawImage(face, -R, -R, R * 2, R * 2); ctx.restore(); }
-  ctx.lineWidth = 2.5; ctx.strokeStyle = C.shirt; ctx.stroke();
+  // Cabeza recortada (pelo y cara, sin fondo ni círculo)
+  const S = R * 2.3;
+  if (faceOk) ctx.drawImage(face, -S / 2, -S / 2 - 2, S, S);
+  else { ctx.beginPath(); ctx.arc(0, 0, R, 0, Math.PI * 2); ctx.fillStyle = C.hair; ctx.fill(); }
   ctx.restore();
 }
 function draw() {
