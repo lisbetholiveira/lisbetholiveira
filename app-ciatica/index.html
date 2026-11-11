@@ -20,6 +20,10 @@
   --move: #1c56c4;
   --ghost: rgba(28, 86, 196, 0.22);
   --floor: #b9c8d1;
+  --skin: #d9a07a; --skin-far: #b7825f; --shirt: #2f6fd0; --shirt-far: #24549e;
+  --pants: #3d4a57; --pants-far: #2a333c; --shoe: #1d2227; --hair: #3b2a22;
+  --mat: #9fd3c7; --mat-edge: #6fb3a4; --chair: #b07a4f; --chair-dark: #8a5c38;
+  --glow: rgba(255, 196, 0, 0.55);
   --font: "Atkinson Hyperlegible", "Segoe UI", Roboto, Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
@@ -163,14 +167,15 @@ details summary { cursor: pointer; font-weight: 700; padding: 8px 0; }
   <div class="stage">
     <canvas id="fig" width="800" height="600" aria-label="Animación del ejercicio"></canvas>
     <div class="legend">
-      <span><i style="background: var(--move)"></i>Lo que se mueve</span>
+      <span><i style="background: var(--glow)"></i>Lo que se mueve</span>
       <span><i style="background: var(--ghost)"></i>Adónde llegar</span>
     </div>
   </div>
 
   <div id="idle" class="card">
-    <p class="muted" id="exDose"></p>
+    <h2>Paso a paso</h2>
     <ol class="how" id="exHow"></ol>
+    <p class="muted" id="exDose"></p>
     <p class="tip" id="exTip"></p>
   </div>
   <div id="running" class="run card" hidden>
@@ -221,72 +226,72 @@ const T = { head:[200,-14], sh:[200,12], mid:[202,45], hip:[203,75], kN:[205,140
 
 const EX = [
   { id:'torsion', name:'Giro de tronco sentado', pos:'Sentado en una silla', chair:true, dose:'3 veces 15 segundos, hacia cada lado',
-    how:['Siéntate en una silla firme, con la espalda recta y los pies apoyados en el suelo.','Gira el tronco despacio hacia un lado y agárrate del respaldo de la silla.','Aguanta respirando tranquilo y vuelve al frente.'],
+    how:["Siéntate derecho en la silla, con los pies apoyados en el suelo.", "Gira el pecho y la cabeza despacio hacia la derecha y agarra el respaldo con la mano.", "Quédate ahí 15 segundos, respirando tranquilo.", "Vuelve al frente despacio y repite hacia la izquierda."],
     tip:'Gira desde la cintura, sin forzar el cuello.',
     sides:true, sideWord:'Lado', sideNames:['derecho','izquierdo'], sets:1, reps:3, rest:8, phases:[['Gira',3,'b'],['Aguanta',15,'b'],['Al frente',3,'a']],
     poses:{ a:mk(C,{el:[196,112],ha:[228,132]}), b:mk(C,{head:[162,48],sh:[166,76],el:[150,104],ha:[143,82]}) } },
   { id:'lateral', name:'Inclinación hacia un lado', pos:'Sentado en una silla', chair:'front', front:true, dose:'3 veces 10 segundos, hacia cada lado',
-    how:['Sentado con la espalda recta, levanta un brazo por encima de la cabeza.','Inclina el tronco despacio hacia el lado contrario.','Aguanta respirando tranquilo y vuelve al centro.'],
+    how:["Siéntate derecho, con los pies apoyados.", "Sube el brazo derecho por encima de la cabeza.", "Inclina el tronco hacia la izquierda, como una palmera, sin echarte hacia delante.", "Aguanta 10 segundos, vuelve al centro y cambia de lado."],
     tip:'Notarás un estiramiento suave en el costado. No te inclines hacia delante.',
     sides:true, sideWord:'Lado', sideNames:['derecho','izquierdo'], sets:1, reps:3, rest:8, phases:[['Inclínate',3,'b'],['Aguanta',10,'b'],['Al centro',3,'a']],
     poses:{ a:F_A, b:F_B } },
   { id:'nervio2', name:'Deslizamiento del nervio (sentado)', pos:'Sentado en una silla', chair:true, dose:'10 veces con cada pierna',
-    how:['Siéntate en el borde de una silla firme, con la espalda recta.','Estira una rodilla y, a la vez, mira hacia arriba.','Después dobla la rodilla y mira hacia abajo. Suave, sin aguantar.'],
+    how:["Siéntate en el borde de la silla, con la espalda derecha.", "Estira la rodilla derecha hasta que la pierna quede recta y, a la vez, levanta la mirada.", "Dobla otra vez la rodilla y baja la mirada.", "Hazlo seguido y suave, sin parar arriba. Luego, la otra pierna."],
     tip:'Usa una silla sin ruedas, pegada a la pared.',
     sides:true, sets:1, reps:10, rest:10, phases:[['Estira y mira arriba',2,'b'],['Dobla y mira abajo',2,'a']],
     poses:{ a:mk(C,{head:[188,58]}), b:mk(C,{head:[160,42],fN:[306,126]}) } },
   { id:'silla', name:'Levantarse de la silla', pos:'Sentado en una silla', chair:true, dose:'2 series de 6',
-    how:['Cruza los brazos sobre el pecho y apoya bien los pies en el suelo.','Échate un poco hacia delante y ponte de pie con la fuerza de las piernas.','Siéntate despacio, controlando la bajada. Si lo necesitas, apóyate con las manos.'],
+    how:["Siéntate en el borde de la silla, con los pies un poco hacia atrás.", "Cruza los brazos sobre el pecho.", "Inclínate hacia delante y ponte de pie empujando con las piernas.", "Siéntate muy despacio. Si hace falta, ayúdate con las manos."],
     tip:'Fortalece las piernas y te ayuda en el día a día.',
     sets:2, reps:6, rest:15, phases:[['Arriba',3,'b'],['Siéntate despacio',3,'a']],
     poses:{ a:mk(C,{el:[190,95],ha:[176,88]}), b:{head:[234,-14],sh:[234,12],mid:[236,45],hip:[238,75],kN:[243,140],fN:[245,205],kF:[239,140],fF:[241,205],el:[250,32],ha:[236,26]} } },
   { id:'resp', name:'Respiración profunda', pos:'Acostado boca arriba', dose:'6 respiraciones lentas',
-    how:['Acuéstate boca arriba con las rodillas dobladas y los pies apoyados.','Pon las manos sobre la barriga.','Toma aire por la nariz inflando la barriga, y suéltalo despacio por la boca.'],
+    how:["Acuéstate boca arriba, con las rodillas dobladas y los pies en el suelo.", "Pon las manos sobre la barriga.", "Toma aire por la nariz y siente cómo sube la barriga.", "Suelta el aire despacio por la boca y siente cómo baja."],
     tip:'Sirve para relajar los músculos antes de empezar.',
     sets:1, reps:6, phases:[['Toma aire',4,'b'],['Suelta el aire',5,'a']],
     poses:{ a:mk(S,{el:[132,186],ha:[165,182]}), b:mk(S,{mid:[150,180],el:[132,174],ha:[165,164]}) } },
   { id:'pelvis', name:'Basculación de la pelvis', pos:'Acostado boca arriba', dose:'2 series de 8',
-    how:['Rodillas dobladas y pies apoyados en el suelo.','Aplana la parte baja de la espalda contra el suelo, metiendo la barriga.','Aguanta un momento y relaja. Es un movimiento pequeño.'],
+    how:["Boca arriba, con las rodillas dobladas.", "Mete la barriga y aprieta la parte baja de la espalda contra el suelo.", "Aguanta tres segundos.", "Relaja y deja que la espalda vuelva a su curva normal."],
     tip:'Respira con normalidad. No aguantes el aire.',
     sets:2, reps:8, rest:15, phases:[['Aplana la espalda',2,'b'],['Aguanta',3,'b'],['Relaja',3,'a']],
     poses:{ a:mk(S,{mid:[150,186]}), b:mk(S,{mid:[150,201],hip:[204,190],kN:[244,136],kF:[240,139]}) } },
   { id:'rodilla', name:'Rodilla al pecho', pos:'Acostado boca arriba', dose:'3 veces 20 segundos, con cada pierna',
-    how:['Abraza una rodilla con las dos manos.','Llévala despacio hacia el pecho. La otra pierna sigue doblada.','Notarás un estiramiento suave en la espalda y en el glúteo.'],
+    how:["Boca arriba, con las dos rodillas dobladas.", "Abraza la rodilla derecha con las dos manos y llévala hacia el pecho.", "Aguanta 20 segundos, respirando tranquilo.", "Bájala despacio y repite con la otra pierna."],
     tip:'Lleva la rodilla solo hasta donde te resulte cómodo.',
     sides:true, sets:1, reps:3, rest:10, phases:[['Rodilla al pecho',3,'b'],['Aguanta',20,'b'],['Suelta',4,'a']],
     poses:{ a:S, b:mk(S,{kN:[178,124],fN:[234,144],el:[135,168],ha:[170,134]}) } },
   { id:'circulos', name:'Círculos con las rodillas', pos:'Acostado boca arriba', dose:'1 minuto',
-    how:['Lleva las dos rodillas hacia el pecho y pon una mano en cada rodilla.','Haz círculos pequeños y lentos con las rodillas.','A la mitad del tiempo, cambia de sentido.'],
+    how:["Boca arriba, lleva las dos rodillas hacia el pecho.", "Pon una mano sobre cada rodilla.", "Mueve las rodillas haciendo círculos pequeños, como si dibujaras una moneda.", "A la mitad, cambia de sentido."],
     tip:'Es un masaje suave para la parte baja de la espalda.',
     loop:60, period:1.3, loopSay:'Círculos pequeños', cues:{30:'Ahora en el otro sentido.',10:'Quedan diez segundos.'},
     poses:{ a:mk(S,{kN:[190,128],fN:[238,140],kF:[186,131],fF:[234,143],el:[150,170],ha:[188,132]}), b:mk(S,{kN:[214,120],fN:[262,132],kF:[210,123],fF:[258,135],el:[160,166],ha:[210,126]}) } },
   { id:'giro', name:'Giro de rodillas', pos:'Acostado boca arriba', dose:'6 veces hacia cada lado',
-    how:['Junta las rodillas.','Déjalas caer despacio hacia un lado, solo hasta donde te resulte cómodo. Los hombros no se despegan del suelo.','Vuelve al centro y repite hacia el otro lado.'],
+    how:["Boca arriba, con las rodillas juntas y dobladas, y los brazos abiertos.", "Deja caer las dos rodillas despacio hacia la derecha.", "Vuelve al centro.", "Ahora déjalas caer hacia la izquierda. Los hombros siempre pegados al suelo."],
     tip:'Hazlo lento, sin impulso.',
     sets:1, reps:6, phases:[['Hacia la derecha',3,'b'],['Al centro',2,'a'],['Hacia la izquierda',3,'b'],['Al centro',2,'a']],
     poses:{ a:S, b:mk(S,{kN:[256,174],kF:[252,166],fN:[296,203],fF:[290,202]}) } },
   { id:'puente', name:'Puente', pos:'Acostado boca arriba', dose:'2 series de 8',
-    how:['Pies apoyados a la anchura de las caderas y brazos a los lados.','Aprieta los glúteos y levanta la cadera hasta que hombros, cadera y rodillas queden en línea.','Baja despacio.'],
+    how:["Boca arriba, con las rodillas dobladas, los pies apoyados y los brazos a los lados.", "Aprieta los glúteos y sube la cadera del suelo.", "Aguanta tres segundos arriba.", "Baja despacio hasta apoyar la espalda."],
     tip:'Fortalece los glúteos y protege la espalda. No hace falta subir mucho.',
     sets:2, reps:8, rest:15, phases:[['Sube',2,'b'],['Aguanta',3,'b'],['Baja',3,'a']],
     poses:{ a:S, b:mk(S,{hip:[208,148],mid:[152,172],kN:[264,136],kF:[260,139]}) } },
   { id:'nervio1', name:'Deslizamiento del nervio (acostado)', pos:'Acostado boca arriba', dose:'10 veces con cada pierna',
-    how:['Sujeta la pierna por detrás del muslo, con la rodilla doblada y el muslo vertical.','Estira la rodilla despacio hasta notar una ligera tensión.','Vuelve a doblarla. Es un vaivén suave: no te quedes con la pierna estirada.'],
+    how:["Boca arriba, sube la rodilla derecha y sujeta el muslo por detrás con las dos manos.", "Estira la rodilla hacia el techo hasta notar una ligera tensión.", "Dobla otra vez la rodilla.", "Hazlo seguido y suave, sin parar arriba. Luego, la otra pierna."],
     tip:'Es normal un hormigueo leve que se pasa enseguida. Si va a más, para.',
     sides:true, sets:1, reps:10, rest:10, phases:[['Estira',2,'b'],['Dobla',2,'a']],
     poses:{ a:mk(S,{kN:[205,124],fN:[262,156],el:[150,172],ha:[200,150]}), b:mk(S,{kN:[205,124],fN:[214,56],el:[150,172],ha:[200,150]}) } },
   { id:'gluteo', name:'Estiramiento del glúteo', pos:'Acostado boca arriba', dose:'2 veces 20 segundos, con cada pierna',
-    how:['Cruza un tobillo sobre la rodilla contraria, formando un 4.','Agarra el muslo de la pierna de abajo y acerca las dos piernas al pecho.','Notarás el estiramiento en el glúteo. Respira tranquilo.'],
+    how:["Boca arriba, con las rodillas dobladas.", "Pon el tobillo derecho sobre la rodilla izquierda, formando un 4.", "Agarra el muslo izquierdo y acércalo al pecho.", "Aguanta 20 segundos y cambia de pierna."],
     tip:'Si no llegas al muslo, ayúdate con una toalla.',
     sides:true, sets:1, reps:2, rest:10, phases:[['Acerca las piernas',3,'b'],['Aguanta',20,'b'],['Suelta',5,'a']],
     poses:{ a:mk(S,{kN:[235,135],fN:[248,142]}), b:mk(S,{kF:[205,125],fF:[258,150],kN:[192,112],fN:[212,124],el:[155,160],ha:[205,132]}) } },
   { id:'atras', name:'Extensión hacia atrás', pos:'De pie', dose:'10 veces',
-    how:['De pie, con los pies separados y las manos en la parte baja de la espalda.','Inclina el tronco hacia atrás despacio, solo un poco, mirando al frente.','Vuelve a ponerte recto.'],
+    how:["De pie, con las manos en la parte baja de la espalda.", "Inclínate hacia atrás despacio, solo un poco, mirando al frente.", "Vuelve a ponerte recto.", "Si sientes que el dolor baja por la pierna, salta este ejercicio."],
     tip:'A algunas personas este movimiento las alivia y a otras les molesta. Si el dolor aumenta o baja por la pierna, sáltalo.',
     sets:1, reps:10, phases:[['Hacia atrás',3,'b'],['Recto',3,'a']],
     poses:{ a:mk(T,{el:[185,55],ha:[196,78]}), b:mk(T,{head:[168,-6],sh:[176,18],mid:[192,46],hip:[208,76],el:[164,58],ha:[190,80]}) } },
   { id:'marcha', name:'Marcha en el sitio', pos:'De pie', dose:'3 minutos',
-    how:['De pie, cerca de una pared o un mueble por si necesitas apoyarte.','Marcha sin moverte del sitio, a un ritmo cómodo, levantando un poco las rodillas.','Si lo prefieres, puedes salir a caminar.'],
+    how:["De pie, cerca de una pared o un mueble.", "Levanta una rodilla y luego la otra, como si caminaras sin moverte.", "Mueve los brazos al ritmo.", "Sigue tres minutos a un ritmo cómodo."],
     tip:'Mantenerte activo es de lo que más ayuda con la ciática.',
     loop:180, period:0.8, loopSay:'A marchar', cues:{120:'Quedan dos minutos.',60:'Queda un minuto.',10:'Quedan diez segundos.'},
     poses:{ a:mk(T,{kF:[232,110],fF:[226,176],el:[190,45],ha:[184,76]}), b:mk(T,{kN:[238,110],fN:[232,176],el:[214,44],ha:[228,70]}) } },
@@ -420,12 +425,13 @@ const clone = o => JSON.parse(JSON.stringify(o));
 
 // Encuadre automático: la figura ocupa todo el dibujo
 function fitView(ex) {
-  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = 208;
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = 216;
   [ex.poses.a, ex.poses.b].forEach(p => { for (const k in p) {
-    const r = k === 'head' ? 16 : 8;
+    const r = k === 'head' ? 22 : 18;
     x0 = Math.min(x0, p[k][0]-r); x1 = Math.max(x1, p[k][0]+r); y0 = Math.min(y0, p[k][1]-r); y1 = Math.max(y1, p[k][1]+r);
   }});
-  if (ex.chair === 'front') { x0 = Math.min(x0, 152); x1 = Math.max(x1, 248); }
+  if (ex.chair === 'front') { x0 = Math.min(x0, 150); x1 = Math.max(x1, 250); }
+  if (ex.pos === 'Acostado boca arriba') { x0 = Math.min(x0, 36); x1 = Math.max(x1, 334); }
   else if (ex.chair) { x0 = Math.min(x0, 132); y0 = Math.min(y0, 66); }
   const pad = 22, w = x1 - x0 + pad*2, h = y1 - y0 + pad*2;
   const s = Math.min(400 / w, 300 / h);
@@ -443,23 +449,62 @@ function setTarget(pose, dur) {
   from = cur ? clone(cur) : clone(pose);
   to = pose; tStart = performance.now(); tDur = Math.max(0.25, dur) * 1000;
 }
-const SEG = [['hip','kF'],['kF','fF'],['sh','mid'],['mid','hip'],['hip','kN'],['kN','fN'],['sh','el'],['el','ha'],['head','sh']];
+// Figura humana: cabeza con pelo y cara, cuerpo con volumen, ropa, manos y zapatos
+function norm(x, y) { const l = Math.hypot(x, y) || 1; return [x / l, y / l]; }
 function drawBody(p, opts) {
-  const lw = { far:13, torso:18, near:15, arm:11, neck:9 };
-  const seg = (a, b, w, col) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(...p[a]); ctx.lineTo(...p[b]); ctx.stroke(); };
-  const colFor = (a, b, base) => opts.ghost ? opts.ghost : ((moving.has(a) || moving.has(b)) && !(a === 'head' || b === 'head') ? opts.move : base);
-  const farCol = opts.ghost || ((moving.has('kF') || moving.has('fF')) ? opts.moveFar : opts.far);
-  seg('hip','kF', lw.far, farCol); seg('kF','fF', lw.far, farCol);
-  seg('head','sh', lw.neck, opts.ghost || opts.fig);
-  seg('sh','mid', lw.torso, colFor('sh','mid', opts.fig)); seg('mid','hip', lw.torso, colFor('mid','hip', opts.fig));
-  seg('hip','kN', lw.near, colFor('hip','kN', opts.fig)); seg('kN','fN', lw.near, colFor('kN','fN', opts.fig));
-  seg('sh','el', lw.arm, colFor('sh','el', opts.fig)); seg('el','ha', lw.arm, colFor('el','ha', opts.fig));
-  if (opts.feet) {
-    const foot = (k, w, col) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(...p[k]); ctx.lineTo(p[k][0] + 18, p[k][1]); ctx.stroke(); };
-    foot('fF', lw.far, farCol); foot('fN', lw.near, colFor('kN','fN', opts.fig));
+  const C = opts.ghost ? null : opts.col;
+  const line = (a, b, w, col) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b); ctx.stroke(); };
+  const path = (pts, w, col) => { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(...pts[0]); pts.slice(1).forEach(q => ctx.lineTo(...q)); ctx.stroke(); };
+  const dot = (c, r, col) => { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(c[0], c[1], r, 0, Math.PI * 2); ctx.fill(); };
+  const shoeDir = (k, f) => {
+    if (opts.front) return [0, 0];
+    if (p[f][1] > 196) return [1, 0];          // pie apoyado en el suelo: horizontal
+    const [dx, dy] = norm(p[f][0] - p[k][0], p[f][1] - p[k][1]);
+    return [dy, -dx];                           // perpendicular a la pierna
+  };
+  const shoe = (k, f, col) => {
+    const [ux, uy] = shoeDir(k, f);
+    if (opts.front) { dot([p[f][0], p[f][1] + 2], 8, col); return; }
+    line(p[f], [p[f][0] + ux * 17, p[f][1] + uy * 17], 11, col);
+  };
+  // Resalte (amarillo) detrás de lo que se mueve
+  if (!opts.ghost) {
+    const segs = [['hip','kF'],['kF','fF'],['sh','mid'],['mid','hip'],['hip','kN'],['kN','fN'],['sh','el'],['el','ha']];
+    segs.forEach(([a, b]) => { if (moving.has(a) || moving.has(b)) line(p[a], p[b], 34, css('--glow')); });
   }
-  ctx.fillStyle = opts.ghost || (moving.has('head') ? opts.move : opts.fig);
-  ctx.beginPath(); ctx.arc(p.head[0], p.head[1], 16, 0, Math.PI*2); ctx.fill();
+  const G = opts.ghost;
+  // Pierna lejana
+  path([p.hip, p.kF, p.fF], 19, G || C.pantsFar); if (!G) shoe('kF', 'fF', C.shoe); else shoe('kF','fF', G);
+  // Brazo lejano no se dibuja (queda detrás del cuerpo)
+  // Tronco (camisa) y cadera (pantalón)
+  path([p.sh, p.mid, p.hip], 34, G || C.shirt);
+  dot(p.hip, 16, G || C.pants);
+  // Cuello
+  line(p.sh, [p.sh[0] + (p.head[0] - p.sh[0]) * 0.55, p.sh[1] + (p.head[1] - p.sh[1]) * 0.55], 11, G || C.skin);
+  // Pierna cercana
+  path([p.hip, p.kN, p.fN], 21, G || C.pants); if (!G) shoe('kN', 'fN', C.shoe); else shoe('kN','fN', G);
+  // Brazo cercano: manga + antebrazo + mano
+  const elbowMid = [p.sh[0] + (p.el[0] - p.sh[0]) * 0.6, p.sh[1] + (p.el[1] - p.sh[1]) * 0.6];
+  line(p.sh, p.el, 14, G || C.skin);
+  line(p.sh, elbowMid, 17, G || C.shirt);
+  line(p.el, p.ha, 12, G || C.skin);
+  dot(p.ha, 7.5, G || C.skin);
+  // Cabeza
+  const [ux, uy] = norm(p.head[0] - p.sh[0], p.head[1] - p.sh[1]);   // hacia arriba de la cabeza
+  const h = p.head;
+  if (G) { dot(h, 17, G); return; }
+  if (opts.front) {
+    dot([h[0], h[1] - 3], 17.5, C.hair);
+    dot([h[0], h[1] + 1], 15.5, C.skin);
+    dot([h[0] - 5.5, h[1]], 2.2, C.hair); dot([h[0] + 5.5, h[1]], 2.2, C.hair);
+    return;
+  }
+  const [fx, fy] = [-uy, ux];                    // hacia donde mira la cara
+  dot([h[0] - fx * 3 + ux * 2, h[1] - fy * 3 + uy * 2], 17.5, C.hair);
+  dot([h[0] + fx * 2, h[1] + fy * 2], 15.5, C.skin);
+  dot([h[0] + fx * 16, h[1] + fy * 16 - uy * 0], 4, C.skin);          // nariz
+  dot([h[0] + fx * 9 + ux * 4, h[1] + fy * 9 + uy * 4], 2.2, C.hair); // ojo
+  dot([h[0] - fx * 1, h[1] - fy * 1], 3.5, C.skinFar);               // oreja
 }
 function draw() {
   if (to) {
@@ -474,18 +519,27 @@ function draw() {
   const s = view.s;
   // suelo
   ctx.strokeStyle = css('--floor'); ctx.lineWidth = 5;
-  ctx.beginPath(); ctx.moveTo(-400, 211); ctx.lineTo(800, 211); ctx.stroke();
-  if (exNow.chair === 'front') {
-    ctx.strokeStyle = css('--floor'); ctx.lineWidth = 8;
-    ctx.beginPath(); ctx.moveTo(160,150); ctx.lineTo(240,150); ctx.moveTo(166,150); ctx.lineTo(166,209); ctx.moveTo(234,150); ctx.lineTo(234,209); ctx.stroke();
-  } else if (exNow.chair) {
-    ctx.strokeStyle = css('--floor'); ctx.lineWidth = 8;
-    ctx.beginPath(); ctx.moveTo(140,72); ctx.lineTo(140,150); ctx.lineTo(212,150); ctx.moveTo(146,150); ctx.lineTo(146,209); ctx.moveTo(206,150); ctx.lineTo(206,209); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-400, 213); ctx.lineTo(800, 213); ctx.stroke();
+  if (exNow.pos === 'Acostado boca arriba') {
+    ctx.fillStyle = css('--mat'); ctx.fillRect(40, 205, 290, 8);
+    ctx.fillStyle = css('--mat-edge'); ctx.fillRect(40, 211, 290, 2);
   }
-  const feet = exNow.pos !== 'Acostado boca arriba' && !exNow.front;
-  const opts = { fig: css('--figure'), far: css('--figure-far'), move: css('--move'), moveFar: css('--move'), feet };
+  if (exNow.chair === 'front') {
+    ctx.strokeStyle = css('--chair-dark'); ctx.lineWidth = 7;
+    ctx.beginPath(); ctx.moveTo(166,150); ctx.lineTo(166,211); ctx.moveTo(234,150); ctx.lineTo(234,211); ctx.stroke();
+    ctx.strokeStyle = css('--chair'); ctx.lineWidth = 10;
+    ctx.beginPath(); ctx.moveTo(158,150); ctx.lineTo(242,150); ctx.stroke();
+  } else if (exNow.chair) {
+    ctx.strokeStyle = css('--chair-dark'); ctx.lineWidth = 7;
+    ctx.beginPath(); ctx.moveTo(146,152); ctx.lineTo(146,211); ctx.moveTo(206,152); ctx.lineTo(206,211); ctx.stroke();
+    ctx.strokeStyle = css('--chair'); ctx.lineWidth = 9;
+    ctx.beginPath(); ctx.moveTo(138,70); ctx.lineTo(140,152); ctx.lineTo(214,152); ctx.stroke();
+  }
+  const front = !!exNow.front;
+  const col = { skin: css('--skin'), skinFar: css('--skin-far'), shirt: css('--shirt'), pants: css('--pants'), pantsFar: css('--pants-far'), shoe: css('--shoe'), hair: css('--hair') };
+  const opts = { col, front };
   // sombra de la posición a la que hay que llegar
-  drawBody(exNow.poses.b, { ghost: css('--ghost'), feet });
+  drawBody(exNow.poses.b, { ghost: css('--ghost'), front });
   // flecha del movimiento
   if (arrow) {
     const [ax, ay] = arrow.a, [bx, by] = arrow.b;
@@ -586,7 +640,7 @@ function introText(i) {
   const posText = i === 0 ? POS_FIRST : POS_MSG[ex.pos];
   return (moved ? posText + ' ' : '') + (i === 0 ? 'Primer ejercicio: ' : 'Siguiente ejercicio: ') + ex.name + '. Cuando estés listo, toca Empezar.';
 }
-const listenText = ex => ex.name + '. ' + ex.how.join(' ') + ' ' + ex.tip;
+const listenText = ex => ex.name + '. ' + ex.how.join(' ');
 const stepText = st => st.first && st.side ? st.word + ' ' + st.side + '. ' + st.say : st.say;
 function phrasesFor(i) {
   const ex = EX[i], out = new Set([introText(i), listenText(ex)]);
